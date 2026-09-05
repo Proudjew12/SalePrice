@@ -8,10 +8,10 @@
   color: var(--color-text);
   cursor: pointer;
   font: inherit;
-  line-height: 1.45;
-  min-height: 46px;
+  line-height: 1.35;
+  min-height: max(32px, 2.3rem);
   min-width: 0;
-  padding: 10px 12px;
+  padding: 4px;
   width: 100%;
 
   &:hover { border-color: var(--color-border-strong); }
@@ -25,7 +25,7 @@
 
   .select {
     align-items: center;
-    gap: 12px;
+    gap: 6px;
     white-space: normal;
 
     &::picker-icon { color: var(--color-text-muted); flex-shrink: 0; }
@@ -60,4 +60,8 @@
       &::checkmark { color: var(--color-accent); margin-left: auto; order: 1; }
     }
   }
+}
+
+@media (any-pointer: coarse) {
+  .select { min-height: max(44px, 2.3rem); }
 }

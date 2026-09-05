@@ -5,8 +5,8 @@ test("offers one unpriced Acronis example license that can be added to an order"
   await page.getByRole("button", { name: "Acronis", exact: true }).click();
   const catalog = page.getByRole("region", { name: "Licenses", exact: true });
   await expect(catalog.getByRole("article")).toHaveCount(1);
-  await expect(catalog.getByText("Price not set", { exact: true })).toBeVisible();
-  await catalog.getByRole("button", { name: "Add Example license to quote", exact: true }).click();
+  await expect(catalog.getByText("Not set", { exact: true })).toHaveCount(3);
+  await catalog.getByRole("button", { name: "Add Example license to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Example license", exact: true });
   await expect(line.getByText("Acronis", { exact: true })).toBeVisible();
   await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");

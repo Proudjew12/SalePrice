@@ -12,6 +12,64 @@ async function expectNoHorizontalOverflow(page: Page): Promise<void> {
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+test("fits three order cards on a wide screen and two on a landscape tablet", async ({ page }) => {
+  await page.setViewportSize({ width: 1867, height: 1000 });
+  await page.goto("/");
+  await expect(page.getByRole("combobox", { name: "Text size", exact: true })).toHaveValue("100");
+  for (const name of ["Business Basic", "Business Standard", "Business Premium"]) {
+    await page.getByRole("button", { name: `Add ${name} to quote`, exact: true }).press("Enter");
+  }
+  const cards = page.getByTestId("quote-line");
+  await expect(cards).toHaveCount(3);
+  const positions = () => cards.evaluateAll((elements) => elements.map((element) => {
+    const { x, y, width } = element.getBoundingClientRect();
+    return { x, y, width };
+  }));
+  await expect.poll(async () => {
+    const [first, second, third] = await positions();
+    return Math.abs(first.y - second.y) < 1 && Math.abs(first.y - third.y) < 1
+      && first.x + first.width <= second.x && second.x + second.width <= third.x;
+  }).toBe(true);
+  await expectNoHorizontalOverflow(page);
+  await page.setViewportSize({ width: 1180, height: 820 });
+  await expect.poll(async () => {
+    const [first, second, third] = await positions();
+    return Math.abs(first.y - second.y) < 1 && first.x + first.width <= second.x && third.y > first.y;
+  }).toBe(true);
+  await expectNoHorizontalOverflow(page);
+});
+
+test("keeps billing readable and numeric fields contained at 150% on portrait tablets and narrow phones", async ({ page }) => {
+  await page.setViewportSize({ width: 834, height: 1194 });
+  await page.goto("/");
+  const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
+  await expect(textSize).toHaveValue("100");
+  await textSize.selectOption("150");
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
+  const line = page.getByRole("group", { name: "Business Basic", exact: true });
+  const billing = line.getByRole("combobox", { name: "Billing Option", exact: true });
+  const quantity = line.getByLabel("Quantity", { exact: true });
+  const price = line.getByRole("textbox", { name: "Price", exact: true });
+  await quantity.fill("3");
+  await price.fill("21");
+  for (const viewport of [{ width: 834, height: 1194 }, { width: 320, height: 700 }]) {
+    await page.setViewportSize(viewport);
+    await expect.poll(async () => {
+      const [cardBox, billingBox, quantityBox, priceBox] = await Promise.all(
+        [line, billing, quantity, price].map((control) => control.boundingBox()),
+      );
+      if (!cardBox || !billingBox || !quantityBox || !priceBox) return false;
+      return billingBox.y + billingBox.height <= quantityBox.y && billingBox.y + billingBox.height <= priceBox.y
+        && quantityBox.x + quantityBox.width <= priceBox.x
+        && [billingBox, quantityBox, priceBox].every((box) => box.x >= cardBox.x && box.x + box.width <= cardBox.x + cardBox.width);
+    }).toBe(true);
+    await expect(quantity).toHaveValue("3");
+    await expect(price).toHaveValue("21");
+    await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$63.00");
+    await expectNoHorizontalOverflow(page);
+  }
+});
+
 test("resizes readable text without losing quote edits and remembers the selection", async ({ page }) => {
   await page.goto("/");
   const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
@@ -24,7 +82,7 @@ test("resizes readable text without losing quote edits and remembers the selecti
   const initialInputSize = await fontSize(customer);
   await customer.fill("Display settings customer");
   await page.getByLabel("Quote reference", { exact: true }).fill("DISPLAY-001");
-  await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Standard", exact: true });
   await line.getByLabel("Quantity", { exact: true }).fill("3");
   await line.getByRole("textbox", { name: "Price", exact: true }).fill("12.50");
@@ -56,7 +114,7 @@ test("keeps New Order confirmation usable at the largest text size", async ({ pa
   const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
   await textSize.selectOption("150");
   await page.getByLabel("Customer", { exact: true }).fill("Keep until confirmed");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const newOrder = page.getByRole("button", { name: "New Order", exact: true });
   await expect(newOrder).toBeVisible();
   page.once("dialog", (dialog) => dialog.dismiss());
@@ -91,7 +149,7 @@ for (const preference of [
     const initialSize = await fontSize(heading);
     await textSize.selectOption("110");
     await expect.poll(async () => (await fontSize(heading)) / initialSize).toBeCloseTo(1.1, 2);
-    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
     await expect(page.getByTestId("quote-line")).toHaveCount(1);
     await expectNoHorizontalOverflow(page);
   });
@@ -110,7 +168,7 @@ test("allows resizing and quoting when browser storage is unavailable", async ({
   await textSize.selectOption("150");
   await expect(textSize).toHaveValue("150");
   await expect.poll(async () => (await fontSize(heading)) / initialSize).toBeCloseTo(1.5, 2);
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   await line.getByLabel("Quantity", { exact: true }).fill("2");
   await line.getByRole("textbox", { name: "Price", exact: true }).fill("15");

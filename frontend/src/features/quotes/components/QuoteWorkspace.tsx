@@ -100,7 +100,7 @@ export function QuoteWorkspace() {
       }}>
         <div className={styles.body}>
           <ProductRail products={catalog.products} selectedId={product?.id ?? ""} onSelect={setSelectedId} editing={editing} onAddProduct={() => setDialog({ kind: "add-product" })} />
-          {product ? <CatalogPanel key={product.id} product={product} billing={initialBilling} onAdd={addLicense} editing={editing}
+          {product ? <CatalogPanel key={product.id} product={product} onAdd={addLicense} editing={editing}
             onAddLicense={() => setDialog({ kind: "add-license", product })} onEditProduct={() => setDialog({ kind: "edit-product", product })}
             onEditLicense={(license) => setDialog({ kind: "edit-license", product, license })} />
             : <section className={styles.emptyCatalog} aria-label="Licenses"><h2>No products yet</h2><p>{editing ? "Use + on the left to add your first product." : "Switch to Edit Mode to add a product."}</p></section>}

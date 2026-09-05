@@ -58,7 +58,7 @@ test("keeps catalog management in Edit Mode and returns to Normal Mode after rel
 
 test("edits built-in names and billing prices without changing existing order lines", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const original = page.getByRole("group", { name: "Business Basic", exact: true });
   await original.getByLabel("Quantity", { exact: true }).fill("2");
   await original.getByRole("textbox", { name: "Price", exact: true }).fill("8.25");
@@ -78,7 +78,7 @@ test("edits built-in names and billing prices without changing existing order li
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
 
   for (const [schedule, price] of [["monthly", 18.75], ["annual-monthly", 12.5], ["annual-upfront", 130]] as const) {
-    await page.getByRole("button", { name: "Add Core seat to quote", exact: true }).click();
+    await page.getByRole("button", { name: "Add Core seat to quote", exact: true }).press("Enter");
     const line = page.getByRole("group", { name: "Core seat", exact: true }).last();
     await line.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption(schedule);
     await expect(line.getByRole("combobox", { name: "Billing Option", exact: true })).toHaveValue(schedule);
@@ -137,16 +137,16 @@ test("saves default prices on new products and licenses, including zero and the 
   await license.getByRole("button", { name: "Add license", exact: true }).click();
   await page.reload();
   await page.getByRole("button", { name: "Support Tools", exact: true }).click();
-  await page.getByRole("button", { name: "Add Support Pro to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Support Pro to quote", exact: true }).press("Enter");
   await expectPrice(page.getByRole("group", { name: "Support Pro", exact: true }), 12.25);
-  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).press("Enter");
   await expect(page.getByRole("group", { name: "Support seat", exact: true }).getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
   await page.getByRole("button", { name: "Remove Support seat", exact: true }).click();
-  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).press("Enter");
   await page.getByRole("group", { name: "Support seat", exact: true }).getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("monthly");
   await expectPrice(page.getByRole("group", { name: "Support seat", exact: true }), 0);
   await expect(page.getByRole("button", { name: "Export PDF", exact: true })).toBeEnabled();
-  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).press("Enter");
   await page.getByRole("group", { name: "Support seat", exact: true }).last().getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
   await expectPrice(page.getByRole("group", { name: "Support seat", exact: true }).last(), 1000000);
   await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$1,000,000.00");
@@ -205,7 +205,7 @@ test("migrates the previous custom catalog and keeps subsequent edits after relo
   await page.reload();
   await page.getByRole("button", { name: "Legacy Tools", exact: true }).click();
   await expect(page.getByRole("button", { name: "Add Legacy seat to quote", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Add Migrated seat to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Migrated seat to quote", exact: true }).press("Enter");
   await expectPrice(page.getByRole("group", { name: "Migrated seat", exact: true }), 9.5);
   await page.getByRole("button", { name: "Microsoft 365", exact: true }).click();
   await expect(page.getByRole("button", { name: "Add Legacy addon to quote", exact: true })).toBeVisible();
@@ -213,7 +213,7 @@ test("migrates the previous custom catalog and keeps subsequent edits after relo
 
 test("persists an empty catalog and can add a product again without losing the order", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   await enterEditMode(page);
   for (const name of ["Business Basic", "Business Standard", "Business Premium"]) {
     const license = await editLicense(page, name);
@@ -254,7 +254,7 @@ test("allows catalog edits for the current visit when storage cannot be written"
   await saveChanges(license);
   await expect(page.getByText(/Your catalog.*could not be saved/)).toBeVisible();
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   await expectPrice(page.getByRole("group", { name: "Business Basic", exact: true }), 14.25);
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$14.25");
 });
@@ -272,7 +272,7 @@ for (const invalid of [
     await page.goto("/");
     await expect(page.getByRole("alert")).toContainText(/Saved products/i);
     await expect(page.getByRole("button", { name: "Invalid saved product", exact: true })).toHaveCount(0);
-    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
     await expect(page.getByRole("group", { name: "Business Basic", exact: true }).getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
     await expect(page.getByTestId("quote-line")).toHaveCount(1);
   });

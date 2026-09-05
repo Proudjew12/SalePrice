@@ -25,7 +25,7 @@ test("chooses every billing schedule from the open picker with mouse or touch at
     { label: "Monthly — Pay Monthly", value: "monthly", price: 12.5 },
     { label: "Annual — Pay Monthly", value: "annual-monthly", price: 10 },
   ]) {
-    await press(page.getByRole("button", { name: "Add Business Basic to quote", exact: true }), hasTouch);
+    await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
     const line = page.getByTestId("quote-line").last();
     const picker = line.getByRole("combobox", { name: "Billing Option", exact: true });
     await expect(picker).toHaveValue("annual-monthly");
@@ -49,7 +49,7 @@ test("chooses every billing schedule from the open picker with mouse or touch at
 
 test("cancels and commits keyboard billing choices while preserving order data on reload", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   const picker = line.getByRole("combobox", { name: "Billing Option", exact: true });
   await line.getByRole("textbox", { name: "Price", exact: true }).fill("15");

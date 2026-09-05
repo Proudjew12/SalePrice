@@ -21,13 +21,15 @@ For sellers quoting licenses from multiple companies:
 1. In **Normal Mode**, choose a product from the compact left rail and search its license list.
    Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
    entries. Product short labels can also be changed.
-2. Drag a license into the quote, or click or tap its card. New items start with **Annual — Pay Monthly**;
+2. Drag a license into the quote. Clicking or tapping a card does not add it.
+   New items start with **Annual — Pay Monthly**;
    choose **Monthly — Pay Monthly** or **Annual — Pay Upfront** on the order item when needed.
    On a tablet, move a card to drag immediately, with no long press. Swipe the space beside the cards
    to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
 3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
-   default USD price for each billing schedule; adding it fills in the matching price. Override
-   that price in the order whenever needed.
+   default USD price for each billing schedule; catalog cards show all three prices together,
+   with monthly or yearly units. Adding a license fills in the matching price. Override that
+   price in the order whenever needed.
 4. Review monthly payments, annual upfront charges, the amount due at the start, and a 12-month
    estimate; download the customer PDF using the button at the bottom.
 
@@ -58,7 +60,7 @@ and custom catalog entries; a new domain has separate browser storage. Customer 
 stay in the browser. PDF generation uses locally bundled code and fonts without sending quote data
 to a server.
 
-Acceptance checks cover desktop mouse drag, immediate tablet drag and tap, keyboard addition,
+Acceptance checks cover desktop mouse drag, immediate tablet drag, ignored clicks/taps, keyboard addition,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
 layout, saved text-size preferences, catalog editing/default prices/migration, and production hosting
 from a repository subpath without an API.
@@ -160,15 +162,19 @@ configuration.
 The first version deliberately keeps catalog selection, quote calculations, and versioned local
 storage in browser-owned domain features. This supports static GitHub Pages hosting without a
 database or deployed backend. `@dnd-kit/react` provides whole-card pointer dragging; native card
-buttons also support clicks, taps, and keyboard addition. Edit buttons remain separate controls.
+buttons support keyboard and assistive activation, while pointer clicks and taps do not add items.
+Edit buttons remain separate controls.
 `jsPDF` is loaded on export and uses a
 bundled, licensed Unicode font for downloadable, paginated documents. React web meets the desktop
 and tablet requirement without a native app or Expo. Revisit persistence and API contracts when
 shared accounts or durable quote history become requirements.
 
 The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
-list. Order fields use compact widths and wrap on smaller screens. Each order card shows the product
-name in bold above the license name, with a **Price** field and the billing period beside the line total.
+list. Order cards fit three per row on wide screens and wrap into fewer columns on smaller screens
+or at larger text sizes. Compact fields retain larger touch targets on tablets. Each order card
+shows the bold product name followed by the license name on one line, with a **Price** field and the
+billing period beside the line total. Catalog cards compare Monthly, Annual · Monthly, and
+Annual · Upfront rates, distinguishing unset prices from zero.
 The header displays the SalePrice logo as plain branding, a percentage-only text-size selector
 from 50% to 150% in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
 the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts use the system font.

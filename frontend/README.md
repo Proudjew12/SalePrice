@@ -1,9 +1,11 @@
 # SalePrice frontend
 
 SalePrice's React, Vite, TypeScript, and SCSS Modules application builds customer software-license
-quotes. Choose or create catalog entries, drag or tap to add licenses, enter your own USD prices,
+quotes. Choose or create catalog entries, drag to add licenses, enter your own USD prices,
 and export a PDF. The three billing schedules distinguish monthly payments from annual upfront
-charges. One draft and custom catalog entries are saved in this browser on this device.
+charges, and catalog cards show all three saved prices together. Clicking or tapping a card does
+not add it; keyboard users can focus a card and press Enter or Space. One draft and custom catalog
+entries are saved in this browser on this device.
 
 This folder is intentionally independent from `backend/`. It communicates with the backend only
 through HTTP and can be copied into its own repository without changing its internal structure.
@@ -85,7 +87,8 @@ npm test
 
 Playwright starts and stops its own Vite server on `127.0.0.1:4175`. Tests run in Chromium at desktop,
 tablet, and mobile sizes. Quote tests cover billing totals and validation, catalog creation, saved
-drafts, mouse dragging, immediate touch dragging and scrolling beside cards, keyboard/tap addition, PDF
+drafts, mouse dragging, immediate touch dragging and scrolling beside cards, keyboard addition,
+ignored clicks/taps, three-price previews, responsive order-card columns, PDF
 download and export retry, and overflow. PDF checks cover Logi branding and recovery from unavailable
 logo/font assets. Health tests cover loading, success, error/retry, malformed
 responses, navigation, and keyboard focus. API responses are controlled in the browser, so this

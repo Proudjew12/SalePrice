@@ -1,14 +1,12 @@
 import { useState } from "react";
 
 import { Icon } from "@/components/ui/Icon";
-import type { BillingOption } from "@/features/quotes/types";
 import type { CatalogLicense, CatalogProduct } from "../types";
 import { LicenseCard } from "./LicenseCard";
 import styles from "./CatalogPanel.module.scss";
 
 interface CatalogPanelProps {
   product: CatalogProduct;
-  billing: BillingOption;
   onAdd: (product: CatalogProduct, license: CatalogLicense) => void;
   onAddLicense: () => void;
   editing: boolean;
@@ -16,7 +14,7 @@ interface CatalogPanelProps {
   onEditLicense: (license: CatalogLicense) => void;
 }
 
-export function CatalogPanel({ product, billing, onAdd, onAddLicense, editing, onEditProduct, onEditLicense }: CatalogPanelProps) {
+export function CatalogPanel({ product, onAdd, onAddLicense, editing, onEditProduct, onEditLicense }: CatalogPanelProps) {
   const [search, setSearch] = useState("");
   const licenses = product.licenses.filter((license) => license.name.toLowerCase().includes(search.trim().toLowerCase()));
 
@@ -32,7 +30,7 @@ export function CatalogPanel({ product, billing, onAdd, onAddLicense, editing, o
       </div>
       <div className={styles.licenses}>
         {licenses.length > 0 ? licenses.map((license) => (
-          <LicenseCard key={license.id} product={product} license={license} billing={billing} editing={editing} onEdit={() => onEditLicense(license)} onAdd={onAdd} />
+          <LicenseCard key={license.id} product={product} license={license} editing={editing} onEdit={() => onEditLicense(license)} onAdd={onAdd} />
         )) : <p className={styles.empty} role="status">{product.licenses.length === 0 ? "No licenses yet" : "No licenses match your search."}</p>}
       </div>
       {editing ? <button type="button" className={styles.addLicense} onClick={onAddLicense}>

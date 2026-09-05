@@ -10,7 +10,7 @@ async function prepareQuote(page: Page): Promise<Locator> {
   await page.goto("/");
   await page.getByLabel("Customer", { exact: true }).fill("Logi quotation customer");
   await page.getByLabel("Quote reference", { exact: true }).fill(reference);
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   await line.getByLabel("Quantity", { exact: true }).fill("2");
   await line.getByRole("textbox", { name: "Price", exact: true }).fill("15.50");

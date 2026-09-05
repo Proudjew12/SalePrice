@@ -12,7 +12,7 @@ test("creates, saves, and exports an order when randomUUID is unavailable", asyn
     getRandomValues: typeof crypto.getRandomValues,
   }))).toEqual({ randomUUID: "undefined", getRandomValues: "function" });
   await page.getByLabel("Customer", { exact: true }).fill("LAN workflow customer");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const builtin = page.getByRole("group", { name: "Business Basic", exact: true });
   await builtin.getByRole("textbox", { name: "Price", exact: true }).fill("10");
 
@@ -23,13 +23,13 @@ test("creates, saves, and exports an order when randomUUID is unavailable", asyn
   await productDialog.getByLabel("First license name", { exact: true }).fill("Support seat");
   await productDialog.getByLabel("Annual paid monthly price", { exact: true }).fill("7.50");
   await productDialog.getByRole("button", { name: "Add product", exact: true }).click();
-  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).press("Enter");
   await page.getByRole("button", { name: "Add license", exact: true }).click();
   const licenseDialog = page.getByRole("dialog", { name: "Add license", exact: true });
   await licenseDialog.getByLabel("License name", { exact: true }).fill("Support Plus");
   await licenseDialog.getByLabel("Annual paid monthly price", { exact: true }).fill("12.50");
   await licenseDialog.getByRole("button", { name: "Add license", exact: true }).click();
-  await page.getByRole("button", { name: "Add Support Plus to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Support Plus to quote", exact: true }).press("Enter");
   const support = page.getByRole("group", { name: "Support seat", exact: true });
   const plus = page.getByRole("group", { name: "Support Plus", exact: true });
   await support.getByLabel("Quantity", { exact: true }).fill("3");

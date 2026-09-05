@@ -12,7 +12,7 @@ test("applies saved billing prices by license identity while preserving override
   await editor.getByLabel("Annual paid monthly price", { exact: true }).fill("12");
   await editor.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true }).first();
   const price = line.getByRole("textbox", { name: "Price", exact: true });
   const billing = line.getByRole("combobox", { name: "Billing Option", exact: true });
@@ -58,7 +58,7 @@ test("applies saved billing prices by license identity while preserving override
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
   await billing.selectOption("monthly");
   await expect(price).toHaveValue("");
-  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
+  await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const replacementLine = page.getByRole("group", { name: "Business Basic", exact: true }).last();
   await expect(replacementLine.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("888");
   await page.reload();

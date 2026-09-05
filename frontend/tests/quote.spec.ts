@@ -11,7 +11,7 @@ function quoteLine(page: Page, name: string): Locator {
 }
 
 async function addLicense(page: Page, name: string): Promise<Locator> {
-  await page.getByRole("button", { name: `Add ${name} to quote`, exact: true }).click();
+  await page.getByRole("button", { name: `Add ${name} to quote`, exact: true }).press("Enter");
   const line = quoteLine(page, name);
   await expect(line).toBeVisible();
   return line;
@@ -63,15 +63,11 @@ test("starts empty, switches products, and searches licenses without requiring t
   const line = quoteLine(page, "Business Basic");
   await expect(line).toBeVisible();
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
-  const productHeading = line.getByRole("heading", { name: "Microsoft 365", level: 2, exact: true });
-  const licenseSubtitle = line.getByText("Business Basic", { exact: true });
-  await expect(productHeading).toBeVisible();
-  await expect(licenseSubtitle).toBeVisible();
-  await expect(line.getByRole("heading", { name: "Business Basic", exact: true })).toHaveCount(0);
-  const productBox = await productHeading.boundingBox();
-  const licenseBox = await licenseSubtitle.boundingBox();
-  if (!productBox || !licenseBox) throw new Error("The product and license names must be visible.");
-  expect(productBox.y + productBox.height).toBeLessThanOrEqual(licenseBox.y);
+  const heading = line.getByRole("heading", { name: /^Microsoft 365.*Business Basic$/, level: 2 });
+  await expect(heading).toBeVisible();
+  await expect(heading).toHaveText("Microsoft 365 – Business Basic");
+  await expect(heading.locator("strong")).toHaveText("Microsoft 365");
+  await expect(line.getByRole("heading")).toHaveCount(1);
   await expect(line.getByText("Price", { exact: true })).toBeVisible();
   await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
   expect(apiRequests).toEqual([]);
@@ -238,17 +234,28 @@ test("adds custom products and licenses and retains them after reload", async ({
   await expect(quoteLine(page, "Supervisor seat")).toBeVisible();
 });
 
-test("cancels a card drag safely and adds exactly once after a real mouse drop", async ({ page, isMobile }) => {
+test("ignores catalog clicks and canceled or outside drags, adding once after a real mouse drop", async ({ page, isMobile }) => {
   test.skip(isMobile, "This scenario verifies desktop mouse input.");
   await page.goto("/");
   await saveBasicDefaultPrice(page);
   const card = page.getByRole("button", { name: "Add Business Basic to quote", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
   await expect(card).toBeVisible();
+  await card.click();
+  await expect(page.getByTestId("quote-line")).toHaveCount(0);
   const sourceBox = await card.boundingBox();
   const targetBox = await target.boundingBox();
   if (!sourceBox || !targetBox) throw new Error("Drag source and quote must be visible.");
-  const start = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
+  let start = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(start.x + 32, start.y, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.getByTestId("quote-line")).toHaveCount(0);
+  await card.hover();
+  const outsideReturn = await card.boundingBox();
+  if (!outsideReturn) throw new Error("The card dropped outside the order must return to the catalog.");
+  start = { x: outsideReturn.x + outsideReturn.width / 2, y: outsideReturn.y + outsideReturn.height / 2 };
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(start.x + 32, start.y, { steps: 8 });
@@ -268,15 +275,17 @@ test("cancels a card drag safely and adds exactly once after a real mouse drop",
   expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await card.click();
-  await expect(page.getByTestId("quote-line")).toHaveCount(2);
+  await expect(page.getByTestId("quote-line")).toHaveCount(1);
 });
 
-test("drags tablet cards immediately, cancels safely, and adds exactly once per tap", async ({ page, context }, testInfo) => {
+test("ignores tablet taps, cancels safely, and adds once from an immediate finger drag", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "tablet", "This scenario verifies tablet touchscreen input.");
   await page.goto("/");
   await saveBasicDefaultPrice(page);
   const card = page.getByRole("button", { name: "Add Business Basic to quote", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
+  await card.tap();
+  await expect(page.getByTestId("quote-line")).toHaveCount(0);
   const sourceBox = await card.boundingBox();
   const targetBox = await target.boundingBox();
   if (!sourceBox || !targetBox) throw new Error("Tablet drag source and quote must be visible together.");
@@ -313,6 +322,9 @@ test("drags tablet cards immediately, cancels safely, and adds exactly once per 
   expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).tap();
+  await expect(quoteLine(page, "Business Standard")).toHaveCount(0);
+  await expect(page.getByTestId("quote-line")).toHaveCount(1);
+  await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).press("Space");
   await expect(quoteLine(page, "Business Standard")).toBeVisible();
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
 });
