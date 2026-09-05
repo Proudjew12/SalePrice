@@ -46,22 +46,6 @@
   display: grid;
   font-size: var(--font-size-body);
   gap: 4px;
-
-  select {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-control);
-    box-shadow: var(--shadow-control);
-    color: var(--color-text);
-    font: inherit;
-    min-height: 44px;
-    min-width: 0;
-    padding: 8px;
-    width: 100%;
-  }
-
-  select:hover { border-color: var(--color-border-strong); }
-  select:focus-visible { @include mixins.focus-ring; }
 }
 
 .billingHint,

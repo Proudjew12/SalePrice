@@ -35,20 +35,20 @@ export const BILLING_OPTIONS: ReadonlyArray<{
 }> = [
   {
     id: "monthly",
-    label: "Monthly",
-    description: "Monthly term, paid monthly",
+    label: "Monthly — Pay Monthly",
+    description: "A one-month subscription, billed monthly.",
     unitLabel: "per license / month",
   },
   {
     id: "annual-monthly",
-    label: "Annual · paid monthly",
-    description: "Annual commitment, paid monthly",
+    label: "Annual — Pay Monthly",
+    description: "A 12-month subscription, billed monthly.",
     unitLabel: "per license / month",
   },
   {
     id: "annual-upfront",
-    label: "Annual · paid upfront",
-    description: "Annual commitment, paid upfront",
+    label: "Annual — Pay Upfront",
+    description: "A 12-month subscription, paid in full at the start of each year.",
     unitLabel: "per license / year",
   },
 ];

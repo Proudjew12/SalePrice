@@ -21,7 +21,7 @@ For sellers quoting licenses from multiple companies:
 1. In **Normal Mode**, choose a product from the compact left rail and search its license list.
    Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
    entries. Product short labels can also be changed.
-2. Choose monthly paid monthly, annual paid monthly, or annual paid upfront. Drag the license into
+2. Choose **Monthly — Pay Monthly**, **Annual — Pay Monthly**, or **Annual — Pay Upfront**. Drag the license into
    the quote, or use its **+** button. On a tablet, briefly hold the drag handle before moving it.
 3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
    default USD price for each billing schedule; adding it fills in the matching price. Override
@@ -164,6 +164,10 @@ the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts u
 The selector scales content text while preserving touch targets and readable header controls; it
 does not change browser zoom or the PDF's print size. Its setting is saved separately from quote
 data on this device. If browser storage is unavailable, changes still apply for the current visit.
+
+Catalog and order billing selectors share clear labels, explanatory subscription terms, and the same
+soft menu styling. They use the [customizable native picker](https://developer.chrome.com/blog/a-customizable-select)
+where supported, with a standard native selector as the fallback.
 
 **New Order** retains the confirmation before clearing an edited draft. Catalog management controls
 are shown only in Edit Mode, and each visit starts in Normal Mode. Catalog storage uses a version 2

@@ -72,13 +72,13 @@ test("calculates mixed billing correctly, preserves edits, removes lines, and do
   await page.getByLabel("Customer", { exact: true }).fill("Acme & Sons – ירושלים");
   await page.getByLabel("Quote reference", { exact: true }).fill("QA-2026-001");
   const basic = await addLicense(page, "Business Basic");
-  await basic.getByRole("combobox", { name: "Billing option", exact: true }).selectOption("monthly");
+  await basic.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("monthly");
   await priceLine(basic, "3", "12.50");
   const standard = await addLicense(page, "Business Standard");
-  await standard.getByRole("combobox", { name: "Billing option", exact: true }).selectOption("annual-monthly");
+  await standard.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-monthly");
   await priceLine(standard, "2", "8");
   const premium = await addLicense(page, "Business Premium");
-  await premium.getByRole("combobox", { name: "Billing option", exact: true }).selectOption("annual-upfront");
+  await premium.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
   await priceLine(premium, "4", "120");
   await expect(premium.getByRole("textbox", { name: "Unit price / year", exact: true })).toBeVisible();
 
@@ -89,7 +89,7 @@ test("calculates mixed billing correctly, preserves edits, removes lines, and do
   await page.reload();
   await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Acme & Sons – ירושלים");
   await expect(page.getByLabel("Quote reference", { exact: true })).toHaveValue("QA-2026-001");
-  await expect(quoteLine(page, "Business Premium").getByRole("combobox", { name: "Billing option", exact: true })).toHaveValue("annual-upfront");
+  await expect(quoteLine(page, "Business Premium").getByRole("combobox", { name: "Billing Option", exact: true })).toHaveValue("annual-upfront");
   await expectAmount(page, "12-month estimate", "$1,122.00");
 
   const downloadPromise = page.waitForEvent("download");
@@ -138,7 +138,7 @@ test("blocks incomplete and invalid numeric inputs while accepting a zero price"
   await page.getByLabel("Customer", { exact: true }).clear();
   await expect(exportButton).toBeDisabled();
   await page.getByLabel("Customer", { exact: true }).fill("Validation customer");
-  await line.getByRole("combobox", { name: "Billing option", exact: true }).selectOption("annual-upfront");
+  await line.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
   await expect(line.getByRole("textbox", { name: "Unit price / year", exact: true })).toHaveValue("");
   await expect(exportButton).toBeDisabled();
   await line.getByRole("textbox", { name: "Unit price / year", exact: true }).fill("120");

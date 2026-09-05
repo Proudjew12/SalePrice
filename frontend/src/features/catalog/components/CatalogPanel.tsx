@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Icon } from "@/components/ui/Icon";
+import { BillingSelect } from "@/features/quotes/components/BillingSelect";
 import { BILLING_OPTIONS } from "@/features/quotes/calculations";
 import type { BillingOption } from "@/features/quotes/types";
 import type { CatalogLicense, CatalogProduct } from "../types";
@@ -34,15 +35,10 @@ export function CatalogPanel({ product, billing, onBillingChange, onAdd, onAddLi
         <input type="search" aria-label="Search licenses" placeholder="Search licenses" value={search} maxLength={80} onChange={(event) => setSearch(event.target.value)} />
       </div>
       <label className={styles.billing} htmlFor="catalog-billing">
-        Billing option
-        <select id="catalog-billing" value={billing} onChange={(event) => {
-          const option = BILLING_OPTIONS.find((candidate) => candidate.id === event.target.value);
-          if (option) onBillingChange(option.id);
-        }}>
-          {BILLING_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-        </select>
+        Billing Option
+        <BillingSelect id="catalog-billing" describedBy="catalog-billing-description" value={billing} onChange={onBillingChange} />
       </label>
-      <p className={styles.billingHint}>{billingDescription}</p>
+      <p id="catalog-billing-description" className={styles.billingHint}>{billingDescription}</p>
       <div className={styles.licenses}>
         {licenses.length > 0 ? licenses.map((license) => (
           <LicenseCard key={license.id} product={product} license={license} billing={billing} editing={editing} onEdit={() => onEditLicense(license)} onAdd={onAdd} />

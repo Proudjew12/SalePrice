@@ -1,0 +1,63 @@
+@use "../../../styles/abstracts/mixins" as mixins;
+
+.select {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-control);
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.45;
+  min-height: 46px;
+  min-width: 0;
+  padding: 10px 12px;
+  width: 100%;
+
+  &:hover { border-color: var(--color-border-strong); }
+  &:focus-visible { @include mixins.focus-ring; }
+}
+
+// Enhance the native picker where supported, retaining native keyboard and touch behavior.
+@supports (appearance: base-select) {
+  .select,
+  .select::picker(select) { appearance: base-select; }
+
+  .select {
+    align-items: center;
+    gap: 12px;
+    white-space: normal;
+
+    &::picker-icon { color: var(--color-text-muted); flex-shrink: 0; }
+    &:open { border-color: var(--color-accent); }
+    &::picker(select) {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-panel);
+      color: var(--color-text);
+      font: inherit;
+      margin-block: 6px;
+      max-height: min(320px, 60dvh);
+      max-width: calc(100vw - 24px);
+      padding: 4px;
+      width: anchor-size(width);
+    }
+
+    option {
+      align-items: center;
+      border-radius: var(--radius-control);
+      cursor: pointer;
+      gap: 10px;
+      line-height: 1.45;
+      min-height: 44px;
+      padding: 10px 12px;
+      white-space: normal;
+
+      &:checked { background: var(--color-accent-soft); color: var(--color-accent-strong); font-weight: 600; }
+      &:hover { background: var(--color-background); }
+      &:focus-visible { @include mixins.focus-ring; outline-offset: -2px; }
+      &::checkmark { color: var(--color-accent); margin-left: auto; order: 1; }
+    }
+  }
+}

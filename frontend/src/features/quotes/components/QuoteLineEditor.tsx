@@ -1,7 +1,8 @@
 import { useId } from "react";
 
 import { Icon } from "@/components/ui/Icon";
-import { BILLING_OPTIONS, calculateLine, formatMoney, getLineError, parsePriceCents, parseQuantity } from "@/features/quotes/calculations";
+import { calculateLine, formatMoney, getLineError, parsePriceCents, parseQuantity } from "@/features/quotes/calculations";
+import { BillingSelect } from "./BillingSelect";
 import type { QuoteLine } from "@/features/quotes/types";
 import styles from "@/features/quotes/components/QuoteLineEditor.module.scss";
 
@@ -28,13 +29,8 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
         </button>
       </div>
       <div className={styles.fields}>
-        <label className={styles.billing}>Billing option
-          <select value={line.billing} onChange={(event) => {
-            const option = BILLING_OPTIONS.find((candidate) => candidate.id === event.target.value);
-            if (option) onChange({ billing: option.id });
-          }}>
-            {BILLING_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
-          </select>
+        <label className={styles.billing}>Billing Option
+          <BillingSelect value={line.billing} onChange={(billing) => onChange({ billing })} />
         </label>
         <label>Quantity
           <input type="text" inputMode="numeric" value={line.quantity} maxLength={5}
