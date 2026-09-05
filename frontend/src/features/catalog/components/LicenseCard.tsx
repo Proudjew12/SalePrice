@@ -1,3 +1,4 @@
+import { PointerActivationConstraints } from "@dnd-kit/dom";
 import { PointerSensor, useDragDropMonitor, useDraggable } from "@dnd-kit/react";
 import { useRef } from "react";
 
@@ -17,8 +18,17 @@ interface LicenseCardProps {
   onEdit: () => void;
 }
 
+const cardPointerSensor = PointerSensor.configure({
+  activationConstraints(event, source) {
+    // A little movement distinguishes touch dragging from tapping, without a hold delay.
+    if (event.pointerType === "touch") return [new PointerActivationConstraints.Distance({ value: 4 })];
+    const defaults = PointerSensor.defaults.activationConstraints;
+    return typeof defaults === "function" ? defaults(event, source) : defaults;
+  },
+});
+
 export function LicenseCard({ product, license, onAdd, billing, editing, onEdit }: LicenseCardProps) {
-  const { ref, isDragging, isDropping } = useDraggable({ id: license.id, type: "license", sensors: [PointerSensor] });
+  const { ref, isDragging, isDropping } = useDraggable({ id: license.id, type: "license", sensors: [cardPointerSensor] });
   const dragged = useRef(false);
   useDragDropMonitor({
     onDragStart(event) {

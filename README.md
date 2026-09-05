@@ -23,8 +23,8 @@ For sellers quoting licenses from multiple companies:
    entries. Product short labels can also be changed.
 2. Drag a license into the quote, or click or tap its card. New items start with **Annual — Pay Monthly**;
    choose **Monthly — Pay Monthly** or **Annual — Pay Upfront** on the order item when needed.
-   On a tablet, briefly hold the card before moving it;
-   swipe immediately to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
+   On a tablet, move a card to drag immediately, with no long press. Swipe the space beside the cards
+   to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
 3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
    default USD price for each billing schedule; adding it fills in the matching price. Override
    that price in the order whenever needed.
@@ -58,7 +58,7 @@ and custom catalog entries; a new domain has separate browser storage. Customer 
 stay in the browser. PDF generation uses locally bundled code and fonts without sending quote data
 to a server.
 
-Acceptance checks cover desktop mouse drag, tablet press-and-drag and tap, keyboard addition,
+Acceptance checks cover desktop mouse drag, immediate tablet drag and tap, keyboard addition,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
 layout, saved text-size preferences, catalog editing/default prices/migration, and production hosting
 from a repository subpath without an API.

@@ -85,7 +85,7 @@ npm test
 
 Playwright starts and stops its own Vite server on `127.0.0.1:4175`. Tests run in Chromium at desktop,
 tablet, and mobile sizes. Quote tests cover billing totals and validation, catalog creation, saved
-drafts, mouse dragging, actual touch events with a short handle hold, keyboard/tap addition, PDF
+drafts, mouse dragging, immediate touch dragging and scrolling beside cards, keyboard/tap addition, PDF
 download and export retry, and overflow. PDF checks cover Logi branding and recovery from unavailable
 logo/font assets. Health tests cover loading, success, error/retry, malformed
 responses, navigation, and keyboard focus. API responses are controlled in the browser, so this

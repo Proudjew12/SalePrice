@@ -15,7 +15,9 @@
   min-height: 64px;
   padding: 10px 14px;
   text-align: left;
-  touch-action: pan-y;
+  // Reserve gestures on the card for immediate dragging; the panel remains scrollable.
+  touch-action: none;
+  -webkit-touch-callout: none;
   user-select: none;
   width: 100%;
 

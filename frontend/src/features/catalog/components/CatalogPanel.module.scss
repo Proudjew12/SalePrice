@@ -71,6 +71,11 @@
   .panel { border-bottom: 1px solid var(--color-border); border-right: 0; overflow: visible; }
 }
 
+@media (any-pointer: coarse) {
+  // Leave enough scrolling space that touch targeting does not select a nearby card.
+  .panel { padding-inline: 32px; }
+}
+
 .editProduct {
   align-items: center; background: transparent; border: 0; border-radius: var(--radius-control); color: var(--color-text-muted); cursor: pointer; display: flex; flex-shrink: 0; justify-content: center; min-height: 44px; width: 44px;
   &:hover { background: var(--color-accent-soft); color: var(--color-accent); }

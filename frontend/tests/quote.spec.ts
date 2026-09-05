@@ -257,7 +257,7 @@ test("cancels a card drag safely and adds exactly once after a real mouse drop",
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
 });
 
-test("supports whole-card tablet dragging and adds exactly once per tap", async ({ page, context }, testInfo) => {
+test("drags tablet cards immediately, cancels safely, and adds exactly once per tap", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "tablet", "This scenario verifies tablet touchscreen input.");
   await page.goto("/");
   await saveBasicDefaultPrice(page);
@@ -271,12 +271,24 @@ test("supports whole-card tablet dragging and adds exactly once per tap", async 
   const session = await context.newCDPSession(page);
   try {
     await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ ...start, id: 1 }] });
-    // dnd-kit's touch sensor activates after a 250ms stationary press.
-    await page.waitForTimeout(300);
+    await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: start.x + 16, y: start.y, id: 1 }] });
+    await session.send("Input.dispatchTouchEvent", { type: "touchCancel", touchPoints: [] });
+    await expect(page.getByTestId("quote-line")).toHaveCount(0);
+
+    // Wait for cancellation feedback to finish without dispatching another tap.
+    await card.tap({ trial: true });
+    const returnedBox = await card.boundingBox();
+    if (!returnedBox) throw new Error("The canceled tablet card must return to the catalog.");
+    const immediateStart = { x: returnedBox.x + returnedBox.width / 2, y: returnedBox.y + returnedBox.height / 2 };
+    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ ...immediateStart, id: 1 }] });
+    // Move beyond the old hold sensor's tolerance immediately; no stationary press.
+    await session.send("Input.dispatchTouchEvent", {
+      type: "touchMove", touchPoints: [{ x: immediateStart.x + 16, y: immediateStart.y, id: 1 }],
+    });
     for (let step = 1; step <= 20; step += 1) {
       await session.send("Input.dispatchTouchEvent", {
         type: "touchMove",
-        touchPoints: [{ x: start.x + (end.x - start.x) * step / 20, y: start.y + (end.y - start.y) * step / 20, id: 1 }],
+        touchPoints: [{ x: immediateStart.x + (end.x - immediateStart.x) * step / 20, y: immediateStart.y + (end.y - immediateStart.y) * step / 20, id: 1 }],
       });
     }
     await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
@@ -291,7 +303,7 @@ test("supports whole-card tablet dragging and adds exactly once per tap", async 
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
 });
 
-test("scrolls tablet license cards with a finger without accidentally adding them", async ({ page, context }, testInfo) => {
+test("scrolls the tablet catalog from its blank gutter without adding licenses", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "tablet", "This scenario verifies native tablet scrolling.");
   await page.goto("/");
   await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
@@ -306,12 +318,14 @@ test("scrolls tablet license cards with a finger without accidentally adding the
   await scrollCard.scrollIntoViewIfNeeded();
   const initialScroll = await panel.evaluate((element) => element.scrollTop);
   expect(await panel.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
-  const box = await scrollCard.boundingBox();
-  if (!box) throw new Error("A license card must be visible to swipe.");
-  const x = box.x + box.width / 2;
-  // A quick swipe over the card should scroll instead of activating a drag or a tap.
+  const cardBox = await scrollCard.boundingBox();
+  const panelBox = await panel.boundingBox();
+  if (!cardBox || !panelBox) throw new Error("The catalog gutter must be visible to swipe.");
+  const x = (panelBox.x + cardBox.x) / 2;
+  // The empty gutter retains native scrolling while the cards themselves drag immediately.
   const direction = initialScroll > 0 ? 1 : -1;
-  const startY = box.y + box.height / 2;
+  const startY = cardBox.y + cardBox.height / 2;
+  expect(await panel.evaluate((element, point) => document.elementFromPoint(point.x, point.y) === element, { x, y: startY })).toBe(true);
   const session = await context.newCDPSession(page);
   try {
     await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: startY, id: 1 }] });
