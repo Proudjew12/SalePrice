@@ -148,6 +148,12 @@ bundled, licensed Unicode font for downloadable, paginated documents. React web 
 and tablet requirement without a native app or Expo. Revisit persistence and API contracts when
 shared accounts or durable quote history become requirements.
 
+The interface uses a light visual theme inspired by the supplied iMS Website community design:
+white surfaces, navy text, blue accents, soft cyan backgrounds, and restrained shadows. Its existing
+quote layout and interactions remain intact. Poppins Latin fonts are bundled locally under their
+SIL Open Font License in `frontend/src/styles/fonts/`; other scripts use the system font fallback.
+The PDF retains its bundled Unicode font and print layout, with a matching blue SalePrice heading.
+
 ## GitHub Pages
 
 The existing `.github/workflows/deploy-pages.yml` deploys `frontend/dist` on pushes to `main`.

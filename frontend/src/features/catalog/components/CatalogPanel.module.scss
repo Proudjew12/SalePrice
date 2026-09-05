@@ -1,7 +1,7 @@
 @use "../../../styles/abstracts/mixins" as mixins;
 
 .panel {
-  background: var(--color-catalog, #1b231f);
+  background: var(--color-catalog);
   border-right: 1px solid var(--color-border);
   min-height: 0;
   min-width: 0;
@@ -21,18 +21,22 @@
 
 .search {
   align-items: center;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 5px;
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-control);
   color: var(--color-text-muted);
   display: flex;
   gap: 10px;
   margin-bottom: 22px;
   padding-inline: 12px;
 
-  &:focus-within { border-color: var(--color-accent); }
+  &:hover { border-color: var(--color-border-strong); }
+  &:focus-within { border-color: var(--color-accent); @include mixins.focus-ring; }
   svg { flex-shrink: 0; }
   input { background: transparent; border: 0; color: var(--color-text); font: inherit; min-height: 48px; min-width: 0; width: 100%; }
-  input:focus-visible { @include mixins.focus-ring; }
+  // The containing search control owns the visible focus ring.
+  input:focus-visible { outline: none; }
   input::placeholder { color: var(--color-text-muted); opacity: 1; }
 }
 
@@ -42,9 +46,10 @@
   gap: 8px;
 
   select {
-    background: var(--color-background);
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 5px;
+    border-radius: var(--radius-control);
+    box-shadow: var(--shadow-control);
     color: var(--color-text);
     font: inherit;
     min-height: 48px;
@@ -53,6 +58,7 @@
     width: 100%;
   }
 
+  select:hover { border-color: var(--color-border-strong); }
   select:focus-visible { @include mixins.focus-ring; }
 }
 
@@ -70,9 +76,10 @@
 
 .addLicense {
   align-items: center;
-  background: transparent;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 5px;
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-control);
   color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
@@ -83,7 +90,8 @@
   padding: 8px 12px;
   width: 100%;
 
-  &:hover { border-color: var(--color-accent); color: var(--color-accent); }
+  svg { color: var(--color-accent); }
+  &:hover { background: var(--color-accent-soft); border-color: var(--color-accent); color: var(--color-accent); }
   &:focus-visible { @include mixins.focus-ring; }
 }
 

@@ -5,8 +5,9 @@
   margin: 0;
   padding: 22px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   background: var(--color-surface);
+  box-shadow: var(--shadow-card);
 }
 
 .heading {
@@ -45,8 +46,9 @@
   label { min-width: 0; display: grid; gap: 8px; font-size: 13px; }
   input, select {
     width: 100%; min-width: 0; height: 46px; padding: 0 10px;
-    border: 1px solid var(--color-border); border-radius: 5px;
-    background: var(--color-background); color: var(--color-text); font-size: 14px;
+    border: 1px solid var(--color-border); border-radius: var(--radius-control);
+    background: var(--color-surface); color: var(--color-text); font-size: 14px; box-shadow: var(--shadow-control);
+    &:hover { border-color: var(--color-border-strong); }
     &:focus-visible { @include mixins.focus-ring; }
     &[aria-invalid="true"] { border-color: var(--color-danger); }
   }

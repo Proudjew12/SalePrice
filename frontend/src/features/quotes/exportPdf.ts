@@ -44,7 +44,7 @@ export async function buildQuotePdf(draft: QuoteDraft): Promise<jsPDF> {
   document.setProperties({ title: `SalePrice quote ${cleanPdfText(draft.reference)}`, author: "SalePrice" });
   const layout = new QuotePdfLayout(document, cleanPdfText(draft.reference));
 
-  layout.paragraph("SalePrice", 23, [32, 93, 66]);
+  layout.paragraph("SalePrice", 23, [0, 91, 234]);
   layout.y += 3;
   layout.paragraph("LICENSE QUOTE", 11);
   layout.y += 3;

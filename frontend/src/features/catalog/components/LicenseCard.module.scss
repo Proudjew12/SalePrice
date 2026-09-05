@@ -4,16 +4,20 @@
   align-items: center;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 5px;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   display: grid;
   gap: 8px;
   grid-template-columns: 32px minmax(0, 1fr) 44px;
   min-height: 122px;
   padding: 16px 12px;
   touch-action: pan-y;
+
+  &:hover { border-color: var(--color-border-strong); }
 }
 
-.dragging { border-color: var(--color-accent); opacity: 0.65; }
+.dragging,
+.dragging:hover { border-color: var(--color-accent); opacity: 0.65; }
 .content { min-width: 0; }
 .content h3 { font-size: 17px; font-weight: 600; line-height: 1.35; margin: 0 0 3px; overflow-wrap: anywhere; }
 .content p { color: var(--color-text-muted); font-size: 14px; line-height: 1.4; margin: 0; overflow-wrap: anywhere; }
@@ -35,9 +39,10 @@
 }
 
 .drag { cursor: grab; margin-inline: -6px; touch-action: none; width: 44px; }
+.drag:hover { color: var(--color-accent); }
 .drag:active { cursor: grabbing; }
 .add { border: 1px solid var(--color-accent); border-radius: 50%; color: var(--color-accent); height: 40px; min-height: 44px; width: 44px; }
-.add:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.add:hover { background: var(--color-accent-soft); border-color: var(--color-accent-strong); color: var(--color-accent-strong); }
 
 @media (max-width: 1100px) {
   .card { gap: 4px; grid-template-columns: 30px minmax(0, 1fr) 44px; padding: 14px 8px; }

@@ -1,26 +1,42 @@
 $colors: (
-  background: #161c1a,
-  surface: #202724,
-  rail: #111714,
-  catalog: #1b231f,
-  text: #eef4ef,
-  text-muted: #9cafa4,
-  border: #34413a,
-  accent: #92e8bc,
-  accent-strong: #b1f3ce,
-  accent-contrast: #12261b,
-  success: #92e8bc,
-  danger: #ffaaa7,
-  warning: #e7c481,
+  background: #fff,
+  surface: #fff,
+  rail: #f8fbff,
+  catalog: #fcfdff,
+  text: #152536,
+  text-muted: #5c6d7e,
+  border: #dce5ef,
+  border-strong: #b4c5d7,
+  accent: #005bea,
+  accent-strong: #004bc2,
+  accent-contrast: #fff,
+  accent-soft: #edf5ff,
+  "cyan": #43d4ff,
+  focus: #005bea,
+  success: #167451,
+  danger: #b42335,
+  warning: #875b10,
+  overlay: rgb(21 37 54 / 35%),
 );
 
 $shadows: (
-  panel: 0 1.2rem 3rem rgb(25 32 56 / 9%),
+  control: 0 2px 4px rgb(21 37 54 / 4%),
+  card: 0 3px 9px rgb(21 37 54 / 6%),
+  panel: 0 16px 40px rgb(21 37 54 / 12%),
+  header: 0 2px 10px rgb(21 37 54 / 3%),
+  footer: 0 -4px 20px rgb(21 37 54 / 4%),
 );
 
 $radii: (
-  control: 0.65rem,
-  panel: 1rem,
+  control: 6px,
+  card: 8px,
+  panel: 10px,
+);
+
+$gradients: (
+  action: linear-gradient(110deg, #005bea, #087db1),
+  brand: linear-gradient(120deg, #005bea, #43d4ff),
+  canvas: (radial-gradient(ellipse at 100% 0, rgb(0 91 234 / 5%), transparent 60%), radial-gradient(ellipse at 0 90%, rgb(67 212 255 / 6%), transparent 60%)),
 );
 
 $spacing: (

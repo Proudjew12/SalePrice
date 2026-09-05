@@ -1,7 +1,11 @@
 @use "./abstracts/variables" as variables;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+
+  @each $name, $value in variables.$gradients {
+    --gradient-#{$name}: #{$value};
+  }
 
   @each $name, $value in variables.$colors {
     --color-#{$name}: #{$value};

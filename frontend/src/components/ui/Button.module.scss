@@ -8,7 +8,7 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-weight: 700;
+  font-weight: 500;
   gap: var(--space-2);
   justify-content: center;
   min-height: functions.rem(44);
@@ -34,7 +34,7 @@
 }
 
 .primary {
-  background: var(--color-accent);
+  background: var(--gradient-action);
   color: var(--color-accent-contrast);
 
   &:hover:not(:disabled) {
