@@ -14,7 +14,7 @@ test("creates, saves, and exports an order when randomUUID is unavailable", asyn
   await page.getByLabel("Customer", { exact: true }).fill("LAN workflow customer");
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
   const builtin = page.getByRole("group", { name: "Business Basic", exact: true });
-  await builtin.getByRole("textbox", { name: /^Unit price/ }).fill("10");
+  await builtin.getByRole("textbox", { name: "Price", exact: true }).fill("10");
 
   await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
   await page.getByRole("button", { name: "Add product", exact: true }).click();
@@ -50,8 +50,8 @@ test("creates, saves, and exports an order when randomUUID is unavailable", asyn
   await expect(page.getByRole("button", { name: "Add Support Plus to quote", exact: true })).toBeVisible();
   await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("LAN workflow customer");
   await expect(support.getByLabel("Quantity", { exact: true })).toHaveValue("3");
-  await expect(builtin.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("10");
-  await expect(plus.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("12.50");
+  await expect(builtin.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("10");
+  await expect(plus.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("12.50");
   await expect(page.getByTestId("quote-line")).toHaveCount(3);
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$45.00");
   await expect(page.getByRole("alert")).toHaveCount(0);

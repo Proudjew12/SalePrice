@@ -40,7 +40,7 @@ test("chooses every billing schedule from the open picker with mouse or touch at
     await press(choice, hasTouch);
     await expect(picker).toHaveValue(option.value);
     await expect(line.getByRole("combobox", { name: "Billing Option", exact: true })).toHaveValue(option.value);
-    expect(Number(await line.getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(option.price);
+    expect(Number(await line.getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(option.price);
   }
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$22.50");
   await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$120.00");
@@ -52,7 +52,8 @@ test("cancels and commits keyboard billing choices while preserving order data o
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   const picker = line.getByRole("combobox", { name: "Billing Option", exact: true });
-  await line.getByRole("textbox", { name: "Unit price / month", exact: true }).fill("15");
+  await line.getByRole("textbox", { name: "Price", exact: true }).fill("15");
+  await expect(line.getByText("per month", { exact: true })).toBeVisible();
   await picker.focus();
   await page.keyboard.press("Space");
   await expect(picker.getByRole("option", { name: "Annual — Pay Upfront", exact: true })).toBeVisible();
@@ -60,14 +61,16 @@ test("cancels and commits keyboard billing choices while preserving order data o
   await page.keyboard.press("Escape");
   await expect(picker).toBeFocused();
   await expect(picker).toHaveValue("annual-monthly");
-  await expect(line.getByRole("textbox", { name: "Unit price / month", exact: true })).toHaveValue("15");
+  await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("15");
+  await expect(line.getByText("per month", { exact: true })).toBeVisible();
 
   await page.keyboard.press("Space");
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(picker).toHaveValue("annual-upfront");
-  const yearlyPrice = line.getByRole("textbox", { name: "Unit price / year", exact: true });
+  const yearlyPrice = line.getByRole("textbox", { name: "Price", exact: true });
   await expect(yearlyPrice).toHaveValue("");
+  await expect(line.getByText("per year", { exact: true })).toBeVisible();
   await yearlyPrice.fill("180");
   await picker.focus();
   await page.keyboard.press("Space");

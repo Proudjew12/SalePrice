@@ -32,7 +32,7 @@ export function QuoteCanvas({ quote, exporting, onExport, onNewOrder, catalogWar
         <div className={styles.details}>
           <label>Customer<input value={draft.customer} placeholder="Customer or company name" maxLength={200} autoComplete="organization"
             onChange={(event) => quote.editDetails({ customer: event.target.value })} /></label>
-          <label>Quote reference<input value={draft.reference} maxLength={64}
+          <label className={styles.reference}>Quote reference<input value={draft.reference} maxLength={64}
             onChange={(event) => quote.editDetails({ reference: event.target.value })} /></label>
         </div>
         <section ref={ref} aria-label="Quote items" className={classNames(styles.items, isDropTarget && styles.over)}>

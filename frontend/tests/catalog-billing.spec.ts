@@ -14,7 +14,7 @@ test("applies saved billing prices by license identity while preserving override
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
   const line = page.getByRole("group", { name: "Business Basic", exact: true }).first();
-  const price = line.getByRole("textbox", { name: /^Unit price/ });
+  const price = line.getByRole("textbox", { name: "Price", exact: true });
   const billing = line.getByRole("combobox", { name: "Billing Option", exact: true });
   await expect(price).toHaveValue("12");
   await price.fill("99");
@@ -60,9 +60,9 @@ test("applies saved billing prices by license identity while preserving override
   await expect(price).toHaveValue("");
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
   const replacementLine = page.getByRole("group", { name: "Business Basic", exact: true }).last();
-  await expect(replacementLine.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("888");
+  await expect(replacementLine.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("888");
   await page.reload();
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
   await expect(price).toHaveValue("");
-  await expect(replacementLine.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("888");
+  await expect(replacementLine.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("888");
 });

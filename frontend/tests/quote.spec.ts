@@ -19,7 +19,7 @@ async function addLicense(page: Page, name: string): Promise<Locator> {
 
 async function priceLine(line: Locator, quantity: string, price: string): Promise<void> {
   await line.getByLabel("Quantity", { exact: true }).fill(quantity);
-  await line.getByRole("textbox", { name: /^Unit price/ }).fill(price);
+  await line.getByRole("textbox", { name: "Price", exact: true }).fill(price);
 }
 
 async function expectAmount(page: Page, name: string, value: string): Promise<void> {
@@ -63,7 +63,17 @@ test("starts empty, switches products, and searches licenses without requiring t
   const line = quoteLine(page, "Business Basic");
   await expect(line).toBeVisible();
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
-  await expect(line.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("");
+  const productHeading = line.getByRole("heading", { name: "Microsoft 365", level: 2, exact: true });
+  const licenseSubtitle = line.getByText("Business Basic", { exact: true });
+  await expect(productHeading).toBeVisible();
+  await expect(licenseSubtitle).toBeVisible();
+  await expect(line.getByRole("heading", { name: "Business Basic", exact: true })).toHaveCount(0);
+  const productBox = await productHeading.boundingBox();
+  const licenseBox = await licenseSubtitle.boundingBox();
+  if (!productBox || !licenseBox) throw new Error("The product and license names must be visible.");
+  expect(productBox.y + productBox.height).toBeLessThanOrEqual(licenseBox.y);
+  await expect(line.getByText("Price", { exact: true })).toBeVisible();
+  await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
   expect(apiRequests).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
@@ -75,13 +85,16 @@ test("calculates mixed billing correctly, preserves edits, removes lines, and do
   const basic = await addLicense(page, "Business Basic");
   await basic.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("monthly");
   await priceLine(basic, "3", "12.50");
+  await expect(basic.getByText("per month", { exact: true })).toBeVisible();
   const standard = await addLicense(page, "Business Standard");
   await standard.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-monthly");
   await priceLine(standard, "2", "8");
+  await expect(standard.getByText("per month", { exact: true })).toBeVisible();
   const premium = await addLicense(page, "Business Premium");
   await premium.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
   await priceLine(premium, "4", "120");
-  await expect(premium.getByRole("textbox", { name: "Unit price / year", exact: true })).toBeVisible();
+  await expect(premium.getByRole("textbox", { name: "Price", exact: true })).toBeVisible();
+  await expect(premium.getByText("per year", { exact: true })).toBeVisible();
 
   await expectAmount(page, "Monthly payments", "$53.50");
   await expectAmount(page, "Annual upfront", "$480.00");
@@ -126,27 +139,28 @@ test("blocks incomplete and invalid numeric inputs while accepting a zero price"
   }
   await line.getByLabel("Quantity", { exact: true }).fill("2");
   for (const price of ["", "-1", "1.234", "1000001"]) {
-    await line.getByRole("textbox", { name: /^Unit price/ }).fill(price);
+    await line.getByRole("textbox", { name: "Price", exact: true }).fill(price);
     await expect(exportButton, `Price ${JSON.stringify(price)} must be invalid`).toBeDisabled();
   }
   await priceLine(line, "9999", "1000000");
   await expect(exportButton).toBeEnabled();
   await expectAmount(page, "12-month estimate", "$119,988,000,000.00");
   await line.getByLabel("Quantity", { exact: true }).fill("2");
-  await line.getByRole("textbox", { name: /^Unit price/ }).fill("0");
+  await line.getByRole("textbox", { name: "Price", exact: true }).fill("0");
   await expect(exportButton).toBeEnabled();
   await expectAmount(page, "12-month estimate", "$0.00");
   await page.getByLabel("Customer", { exact: true }).clear();
   await expect(exportButton).toBeDisabled();
   await page.getByLabel("Customer", { exact: true }).fill("Validation customer");
   await line.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
-  await expect(line.getByRole("textbox", { name: "Unit price / year", exact: true })).toHaveValue("");
+  await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
+  await expect(line.getByText("per year", { exact: true })).toBeVisible();
   await expect(exportButton).toBeDisabled();
-  await line.getByRole("textbox", { name: "Unit price / year", exact: true }).fill("120");
+  await line.getByRole("textbox", { name: "Price", exact: true }).fill("120");
   await expectAmount(page, "12-month estimate", "$240.00");
-  await line.getByRole("textbox", { name: /^Unit price/ }).clear();
+  await line.getByRole("textbox", { name: "Price", exact: true }).clear();
   await page.reload();
-  await expect(quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ })).toHaveValue("");
+  await expect(quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
   await expect(exportButton).toBeDisabled();
 });
 
@@ -161,7 +175,7 @@ test("retains the quote after a PDF font failure and succeeds on retry", async (
   const exportButton = page.getByRole("button", { name: "Export PDF", exact: true });
   await exportButton.click();
   await expect(page.getByRole("alert")).toContainText("The PDF could not be created.");
-  await expect(line.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("15");
+  await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("15");
   await expect(exportButton).toBeEnabled();
   await page.unroute("**/fonts/DejaVuSans.ttf");
   const downloadPromise = page.waitForEvent("download");
@@ -251,7 +265,7 @@ test("cancels a card drag safely and adds exactly once after a real mouse drop",
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
   await page.mouse.up();
   await expect(quoteLine(page, "Business Basic")).toBeVisible();
-  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(15.5);
+  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await card.click();
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
@@ -296,7 +310,7 @@ test("drags tablet cards immediately, cancels safely, and adds exactly once per 
     await session.detach();
   }
   await expect(quoteLine(page, "Business Basic")).toBeVisible();
-  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(15.5);
+  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).tap();
   await expect(quoteLine(page, "Business Standard")).toBeVisible();

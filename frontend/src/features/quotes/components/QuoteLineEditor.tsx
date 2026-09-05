@@ -15,6 +15,7 @@ interface Props {
 export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
   const errorId = useId();
   const priceLabelId = useId();
+  const priceUnitId = useId();
   const total = calculateLine(line);
   const error = getLineError(line);
   const yearly = line.billing === "annual-upfront";
@@ -23,7 +24,7 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
   return (
     <fieldset className={styles.item} aria-label={line.licenseName} data-testid="quote-line">
       <div className={styles.heading}>
-        <div><h2>{line.licenseName}</h2><p>{line.productName}</p></div>
+        <div><h2>{line.productName}</h2><p>{line.licenseName}</p></div>
         <button type="button" className={styles.remove} aria-label={`Remove ${line.licenseName}`} onClick={onRemove}>
           <Icon name="close" />
         </button>
@@ -32,24 +33,24 @@ export function QuoteLineEditor({ line, onChange, onRemove }: Props) {
         <label className={styles.billing}>Billing Option
           <BillingSelect value={line.billing} onChange={(billing) => onChange({ billing })} />
         </label>
-        <label>Quantity
+        <label className={styles.quantity}>Quantity
           <input type="text" inputMode="numeric" value={line.quantity} maxLength={5}
             aria-invalid={parseQuantity(line.quantity) === null}
             aria-describedby={showError ? errorId : undefined}
             onChange={(event) => onChange({ quantity: event.target.value })} />
         </label>
-        <label><span id={priceLabelId}>Unit price / {yearly ? "year" : "month"}</span>
+        <label className={styles.priceField}><span id={priceLabelId}>Price</span>
           <span className={styles.price}><span aria-hidden="true">$</span>
             <input type="text" inputMode="decimal" placeholder="0.00" value={line.unitPrice} maxLength={12}
               aria-labelledby={priceLabelId}
               aria-invalid={Boolean(line.unitPrice && parsePriceCents(line.unitPrice) === null)}
-              aria-describedby={showError ? errorId : undefined}
+              aria-describedby={`${priceUnitId}${showError ? ` ${errorId}` : ""}`}
               onChange={(event) => onChange({ unitPrice: event.target.value })} />
           </span>
         </label>
         <div className={styles.total}><span>Line total</span>
           <output aria-label={`${line.licenseName} line total`}>{total.valid ? formatMoney(total.subtotalCents) : "—"}</output>
-          <small>per {yearly ? "year" : "month"}</small>
+          <small id={priceUnitId}>per {yearly ? "year" : "month"}</small>
         </div>
       </div>
       {showError ? <p className={styles.error} id={errorId}>{error}</p> : null}

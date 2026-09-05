@@ -13,7 +13,7 @@ async function prepareQuote(page: Page): Promise<Locator> {
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   await line.getByLabel("Quantity", { exact: true }).fill("2");
-  await line.getByRole("textbox", { name: /^Unit price/ }).fill("15.50");
+  await line.getByRole("textbox", { name: "Price", exact: true }).fill("15.50");
   return line;
 }
 
@@ -57,7 +57,7 @@ for (const asset of [
     await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Logi quotation customer");
     await expect(page.getByLabel("Quote reference", { exact: true })).toHaveValue(reference);
     await expect(line.getByLabel("Quantity", { exact: true })).toHaveValue("2");
-    await expect(line.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("15.50");
+    await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("15.50");
     expect(downloads).toEqual([]);
     await page.unroute(asset.path);
     await downloadQuote(page, testInfo);

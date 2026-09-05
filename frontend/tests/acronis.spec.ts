@@ -9,7 +9,7 @@ test("offers one unpriced Acronis example license that can be added to an order"
   await catalog.getByRole("button", { name: "Add Example license to quote", exact: true }).click();
   const line = page.getByRole("group", { name: "Example license", exact: true });
   await expect(line.getByText("Acronis", { exact: true })).toBeVisible();
-  await expect(line.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("");
+  await expect(line.getByRole("textbox", { name: "Price", exact: true })).toHaveValue("");
 });
 
 test("adds the example once to an older saved catalog without restoring other defaults", async ({ page }) => {

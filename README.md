@@ -167,7 +167,9 @@ and tablet requirement without a native app or Expo. Revisit persistence and API
 shared accounts or durable quote history become requirements.
 
 The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
-list. The header displays the SalePrice logo as plain branding, a percentage-only text-size selector
+list. Order fields use compact widths and wrap on smaller screens. Each order card shows the product
+name in bold above the license name, with a **Price** field and the billing period beside the line total.
+The header displays the SalePrice logo as plain branding, a percentage-only text-size selector
 from 50% to 150% in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
 the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts use the system font.
 The selector scales content text while preserving touch targets and readable header controls; it
