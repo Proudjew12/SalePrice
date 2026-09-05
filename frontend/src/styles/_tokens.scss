@@ -1,0 +1,29 @@
+@use "./abstracts/variables" as variables;
+
+:root {
+  color-scheme: dark;
+
+  @each $name, $value in variables.$colors {
+    --color-#{$name}: #{$value};
+  }
+
+  @each $name, $value in variables.$shadows {
+    --shadow-#{$name}: #{$value};
+  }
+
+  @each $name, $value in variables.$radii {
+    --radius-#{$name}: #{$value};
+  }
+
+  @each $name, $value in variables.$spacing {
+    --space-#{$name}: #{$value};
+  }
+
+  @each $name, $value in variables.$layout {
+    --#{$name}: #{$value};
+  }
+
+  @each $name, $value in variables.$motion {
+    --motion-#{$name}: #{$value};
+  }
+}

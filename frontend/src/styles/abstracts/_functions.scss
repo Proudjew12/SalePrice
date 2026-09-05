@@ -1,0 +1,9 @@
+@use "sass:math";
+
+@function rem($pixels, $base: 16) {
+  @if not math.is-unitless($pixels) or not math.is-unitless($base) {
+    @error "rem() expects unitless pixel and base values.";
+  }
+
+  @return math.div($pixels, $base) * 1rem;
+}

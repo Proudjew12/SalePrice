@@ -1,0 +1,44 @@
+$colors: (
+  background: #161c1a,
+  surface: #202724,
+  rail: #111714,
+  catalog: #1b231f,
+  text: #eef4ef,
+  text-muted: #9cafa4,
+  border: #34413a,
+  accent: #92e8bc,
+  accent-strong: #b1f3ce,
+  accent-contrast: #12261b,
+  success: #92e8bc,
+  danger: #ffaaa7,
+  warning: #e7c481,
+);
+
+$shadows: (
+  panel: 0 1.2rem 3rem rgb(25 32 56 / 9%),
+);
+
+$radii: (
+  control: 0.65rem,
+  panel: 1rem,
+);
+
+$spacing: (
+  2: 0.5rem,
+  3: 0.75rem,
+  4: 1rem,
+  6: 1.5rem,
+);
+
+$layout: (
+  content-width: 76rem,
+  page-gutter: clamp(1rem, 4vw, 2.5rem),
+);
+
+$motion: (
+  fast: 160ms ease,
+);
+
+$breakpoints: (
+  compact: 52rem,
+);

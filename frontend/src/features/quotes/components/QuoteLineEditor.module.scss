@@ -1,0 +1,80 @@
+@use "../../../styles/abstracts/mixins" as mixins;
+
+.item {
+  min-width: 0;
+  margin: 0;
+  padding: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 24px;
+
+  h2 { margin: 0 0 3px; font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
+  p { margin: 0; color: var(--color-text-muted); font-size: 14px; overflow-wrap: anywhere; }
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: -8px -8px 0 0;
+  background: transparent;
+  border: 0;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  &:hover { color: var(--color-danger); background: var(--color-background); }
+  &:focus-visible { @include mixins.focus-ring; }
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.45fr) minmax(68px, .65fr) minmax(120px, 1fr) minmax(100px, .7fr);
+  gap: 16px;
+  align-items: start;
+
+  label { min-width: 0; display: grid; gap: 8px; font-size: 13px; }
+  input, select {
+    width: 100%; min-width: 0; height: 46px; padding: 0 10px;
+    border: 1px solid var(--color-border); border-radius: 5px;
+    background: var(--color-background); color: var(--color-text); font-size: 14px;
+    &:focus-visible { @include mixins.focus-ring; }
+    &[aria-invalid="true"] { border-color: var(--color-danger); }
+  }
+}
+
+.price {
+  display: flex; align-items: center; position: relative;
+  > span { position: absolute; left: 12px; color: var(--color-text-muted); pointer-events: none; }
+  input { padding-left: 28px; }
+}
+
+.total {
+  display: grid; gap: 8px; padding-left: 4px;
+  > span { font-size: 13px; }
+  output { font-size: 20px; font-weight: 600; min-height: 28px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  small { color: var(--color-text-muted); font-size: 11px; margin-top: -9px; }
+}
+
+.error { font-size: 12px; color: var(--color-danger); margin: 12px 0 0; }
+
+@media (max-width: 1250px) {
+  .fields { grid-template-columns: minmax(70px, .65fr) minmax(130px, 1.2fr) minmax(110px, 1fr); }
+  .billing { grid-column: 1 / -1; }
+}
+
+@media (max-width: 950px) {
+  .item { padding: 16px; }
+  .fields { grid-template-columns: minmax(65px, .6fr) minmax(110px, 1fr); gap: 12px; }
+  .total { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 12px; padding-left: 0; }
+  .heading { margin-bottom: 16px; h2 { font-size: 17px; } }
+}

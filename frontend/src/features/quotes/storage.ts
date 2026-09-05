@@ -1,0 +1,94 @@
+import { BILLING_OPTIONS, QUOTE_LIMITS } from "./types";
+import type { QuoteDraft, QuoteLine } from "./types";
+
+export const QUOTE_STORAGE_KEY = "saleprice.quote.v1";
+const MAX_STORED_CHARACTERS = 120_000;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isText(value: unknown, maximum: number): value is string {
+  return typeof value === "string" && value.length <= maximum;
+}
+
+function isStoredLine(value: unknown): value is QuoteLine {
+  return (
+    isRecord(value) &&
+    isText(value.id, QUOTE_LIMITS.id) && value.id.length > 0 &&
+    isText(value.productId, QUOTE_LIMITS.id) &&
+    isText(value.productName, QUOTE_LIMITS.name) &&
+    isText(value.licenseName, QUOTE_LIMITS.name) &&
+    BILLING_OPTIONS.some((option) => option.id === value.billing) &&
+    isText(value.quantity, QUOTE_LIMITS.numericInput) &&
+    isText(value.unitPrice, QUOTE_LIMITS.numericInput)
+  );
+}
+
+export function isQuoteDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+export function isQuoteDraft(value: unknown): value is QuoteDraft {
+  if (
+    !isRecord(value) || value.version !== 1 ||
+    !isText(value.reference, QUOTE_LIMITS.reference) ||
+    !isText(value.customer, QUOTE_LIMITS.customer) ||
+    !isText(value.notes, QUOTE_LIMITS.notes) ||
+    !isText(value.date, 10) || !isQuoteDate(value.date) ||
+    !Array.isArray(value.lines) || value.lines.length > QUOTE_LIMITS.lines ||
+    !value.lines.every(isStoredLine)
+  ) {
+    return false;
+  }
+  return new Set(value.lines.map((line: QuoteLine) => line.id)).size === value.lines.length;
+}
+
+export function createDraft(): QuoteDraft {
+  const today = new Date();
+  const date = [
+    String(today.getFullYear()),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
+  const suffix = globalThis.crypto.randomUUID().slice(0, 8).toUpperCase();
+  return {
+    version: 1,
+    reference: `SP-${date.replaceAll("-", "")}-${suffix}`,
+    customer: "",
+    notes: "",
+    date,
+    lines: [],
+  };
+}
+
+export function loadDraft(): { draft: QuoteDraft; warning: string | null; } {
+  try {
+    const stored = localStorage.getItem(QUOTE_STORAGE_KEY);
+    if (stored === null) return { draft: createDraft(), warning: null };
+    if (stored.length <= MAX_STORED_CHARACTERS) {
+      const parsed: unknown = JSON.parse(stored);
+      if (isQuoteDraft(parsed)) return { draft: parsed, warning: null };
+    }
+    return { draft: createDraft(), warning: "The saved quote could not be read. A new draft is ready." };
+  } catch {
+    return {
+      draft: createDraft(),
+      warning: "The saved quote is unavailable. Changes may not be kept after you leave this page.",
+    };
+  }
+}
+
+export function saveDraft(draft: QuoteDraft): boolean {
+  if (!isQuoteDraft(draft)) return false;
+  try {
+    const serialized = JSON.stringify(draft);
+    if (serialized.length > MAX_STORED_CHARACTERS) return false;
+    localStorage.setItem(QUOTE_STORAGE_KEY, serialized);
+    return true;
+  } catch {
+    return false;
+  }
+}

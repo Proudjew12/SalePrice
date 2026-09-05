@@ -1,0 +1,66 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: backend/requirements/development.lock
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm run setup
+
+      - name: Install browser system dependencies
+        run: npm exec -- playwright install-deps chromium
+        working-directory: frontend
+
+      - name: Run the complete quality gate
+        run: npm run check
+
+      - name: Smoke-test coordinated startup and shutdown
+        run: npm run smoke
+
+      - name: Audit frontend dependencies
+        run: npm --prefix frontend audit --audit-level=high
+
+      - name: Set up uv for an isolated Python dependency audit
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.12.9"
+          enable-cache: false
+
+      - name: Audit Python lockfiles
+        run: >-
+          uvx --from pip-audit==2.10.1 pip-audit --strict --disable-pip
+          --progress-spinner=off -r backend/requirements/production.lock -r backend/requirements/development.lock

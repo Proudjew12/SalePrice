@@ -1,0 +1,32 @@
+.page {
+  max-width: 36rem;
+}
+
+.content {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  p:not(.code) {
+    color: var(--color-text-muted);
+  }
+}
+
+.code {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

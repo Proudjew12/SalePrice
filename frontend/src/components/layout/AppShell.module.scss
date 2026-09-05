@@ -1,0 +1,60 @@
+@use "../../styles/abstracts/functions" as functions;
+
+.shell {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+.skipLink {
+  background: var(--color-text);
+  border-radius: var(--radius-control);
+  color: var(--color-surface);
+  font-weight: 700;
+  left: var(--page-gutter);
+  padding: var(--space-3) var(--space-4);
+  position: fixed;
+  top: var(--space-3);
+  transform: translateY(calc(-100% - var(--space-4)));
+  transition: transform var(--motion-fast);
+  z-index: 10;
+
+  &:focus {
+    transform: translateY(0);
+  }
+}
+
+.header,
+.main,
+.footer {
+  margin-inline: auto;
+  max-width: var(--content-width);
+  padding-inline: var(--page-gutter);
+  width: 100%;
+}
+
+.header {
+  align-items: center;
+  display: flex;
+  min-height: functions.rem(72);
+}
+
+.brand {
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.main {
+  align-items: center;
+  display: grid;
+  padding-block: clamp(3rem, 8vw, 7rem);
+}
+
+.footer {
+  color: var(--color-text-muted);
+  font-size: functions.rem(14);
+  padding-block: 1.5rem;
+}

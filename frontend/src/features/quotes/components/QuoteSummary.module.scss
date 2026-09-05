@@ -1,0 +1,39 @@
+@use "../../../styles/abstracts/mixins" as mixins;
+
+.summary {
+  flex-shrink: 0; border-top: 1px solid var(--color-border); padding: 24px 32px 18px;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 22px;
+  background: var(--color-background);
+}
+.metrics {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  > div { padding: 0 14px; border-right: 1px solid var(--color-border); min-width: 0; }
+  > div:first-child { padding-left: 0; }
+  span { display: block; font-size: 12px; margin-bottom: 8px; }
+  output { font-size: clamp(17px, 1.6vw, 26px); letter-spacing: -.03em; font-weight: 500; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+}
+.action {
+  display: flex; align-items: center; gap: 18px;
+  p { max-width: 150px; margin: 0; color: var(--color-text-muted); font-size: 12px; }
+  button {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 50px; padding: 12px 18px; border: 0; border-radius: 5px;
+    color: var(--color-accent-contrast); background: var(--color-accent); cursor: pointer; font-size: 14px; font-weight: 600; white-space: nowrap;
+    &:hover:not(:disabled) { background: var(--color-accent-strong); }
+    &:disabled { opacity: .4; cursor: not-allowed; }
+    &:focus-visible { @include mixins.focus-ring; }
+  }
+}
+.caption {
+  grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between;
+  color: var(--color-text-muted); font-size: 11px;
+  output { margin-left: 8px; color: var(--color-text); font-variant-numeric: tabular-nums; }
+}
+.assumption { grid-column: 1 / -1; margin: -6px 0 0; color: var(--color-text-muted); font-size: 11px; }
+@media (max-width: 1400px) { .action { flex-direction: column; align-items: stretch; gap: 8px; p { max-width: 170px; } } }
+@media (max-width: 1100px) {
+  .summary { padding: 18px 22px; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .metrics > div { padding-inline: 10px; &:last-child { border: 0; } }
+  .action { flex-direction: row; justify-content: space-between; align-items: center; p { max-width: 180px; } }
+}
+@media (max-width: 900px) { .summary { padding: 16px; } .metrics span { font-size: 11px; } }

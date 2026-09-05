@@ -1,0 +1,26 @@
+{
+  "name": "saleprice",
+  "version": "0.3.0",
+  "private": true,
+  "description": "SalePrice application with a React frontend and FastAPI backend.",
+  "engines": {
+    "node": ">=22.22.2",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "setup": "python3 scripts/bootstrap.py",
+    "setup:frontend": "npm --prefix frontend ci",
+    "setup:backend": "python3 backend/manage.py setup",
+    "dev": "python3 scripts/dev.py",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "python3 backend/manage.py dev",
+    "check": "python3 scripts/check.py",
+    "check:frontend": "npm --prefix frontend run check",
+    "check:backend": "python3 backend/manage.py check",
+    "test": "python3 -m unittest discover -s scripts/tests && python3 backend/manage.py test && npm --prefix frontend test",
+    "smoke": "python3 scripts/tests/smoke.py",
+    "clean": "python3 scripts/clean.py",
+    "validate:structure": "python3 scripts/checks/check_structure.py",
+    "lock:python": "python3 backend/manage.py lock"
+  }
+}

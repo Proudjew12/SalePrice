@@ -1,0 +1,63 @@
+@use "../../styles/abstracts/functions" as functions;
+@use "../../styles/abstracts/mixins" as mixins;
+
+.button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  gap: var(--space-2);
+  justify-content: center;
+  min-height: functions.rem(44);
+  padding: 0.7rem 1rem;
+  transition:
+    background-color var(--motion-fast),
+    border-color var(--motion-fast),
+    color var(--motion-fast),
+    transform var(--motion-fast);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    @include mixins.focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent-strong);
+  }
+}
+
+.secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text);
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-text-muted);
+  }
+}
+
+@include mixins.reduced-motion {
+  .button {
+    transition: none;
+
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+  }
+}

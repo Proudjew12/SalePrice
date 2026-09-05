@@ -1,0 +1,100 @@
+@use "../../../styles/abstracts/mixins" as mixins;
+
+.panel {
+  background: var(--color-catalog, #1b231f);
+  border-right: 1px solid var(--color-border);
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 32px clamp(18px, 2.35vw, 36px);
+  scrollbar-width: thin;
+  touch-action: pan-y;
+}
+
+.heading {
+  margin-bottom: 22px;
+
+  h2 { font-size: clamp(23px, 2vw, 31px); font-weight: 600; line-height: 1.2; margin: 0 0 7px; overflow-wrap: anywhere; }
+  p { color: var(--color-text-muted); font-size: 16px; margin: 0; }
+}
+
+.search {
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text-muted);
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding-inline: 12px;
+
+  &:focus-within { border-color: var(--color-accent); }
+  svg { flex-shrink: 0; }
+  input { background: transparent; border: 0; color: var(--color-text); font: inherit; min-height: 48px; min-width: 0; width: 100%; }
+  input:focus-visible { @include mixins.focus-ring; }
+  input::placeholder { color: var(--color-text-muted); opacity: 1; }
+}
+
+.billing {
+  display: grid;
+  font-size: 14px;
+  gap: 8px;
+
+  select {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    color: var(--color-text);
+    font: inherit;
+    min-height: 48px;
+    min-width: 0;
+    padding: 10px;
+    width: 100%;
+  }
+
+  select:focus-visible { @include mixins.focus-ring; }
+}
+
+.billingHint,
+.instruction {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.billingHint { margin: 8px 0 22px; }
+.instruction { margin: 22px 0 14px; }
+.licenses { display: grid; gap: 10px; }
+.empty { color: var(--color-text-muted); font-size: 15px; padding-block: 20px; }
+
+.addLicense {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 8px;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 12px;
+  width: 100%;
+
+  &:hover { border-color: var(--color-accent); color: var(--color-accent); }
+  &:focus-visible { @include mixins.focus-ring; }
+}
+
+@media (max-width: 1100px) {
+  .panel { padding: 24px 18px; }
+  .heading p { font-size: 14px; }
+  .search input { font-size: 14px; }
+  .billingHint,
+  .instruction { font-size: 13px; }
+}
+
+@media (max-width: 699px) {
+  .panel { border-bottom: 1px solid var(--color-border); border-right: 0; overflow: visible; }
+}

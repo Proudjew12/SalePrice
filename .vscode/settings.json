@@ -1,0 +1,27 @@
+{
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, .npmrc, .nvmrc, .python-version, .editorconfig, .gitignore, .gitattributes, .env, .env.*, tsconfig.json",
+    "pyproject.toml": ".python-version, .editorconfig, .gitignore, .gitattributes, .env, .env.*"
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "**/.venv": true,
+    "**/__pycache__": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/dist": true,
+    "**/coverage": true,
+    "**/htmlcov": true,
+    "**/playwright-report": true,
+    "**/test-results": true,
+    "**/*.tsbuildinfo": true
+  },
+  "eslint.workingDirectories": ["./frontend"],
+  "eslint.options": {
+    "overrideConfigFile": "config/eslint.config.js"
+  },
+  "typescript.tsdk": "frontend/node_modules/typescript/lib"
+}

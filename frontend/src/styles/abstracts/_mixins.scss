@@ -1,0 +1,25 @@
+@use "sass:map";
+@use "./variables" as variables;
+
+@mixin breakpoint-down($name) {
+  $width: map.get(variables.$breakpoints, $name);
+
+  @if $width == null {
+    @error "Unknown breakpoint: #{$name}";
+  }
+
+  @media (max-width: $width) {
+    @content;
+  }
+}
+
+@mixin focus-ring {
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 38%, transparent);
+  outline-offset: 2px;
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
