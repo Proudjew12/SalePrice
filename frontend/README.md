@@ -86,7 +86,8 @@ npm test
 Playwright starts and stops its own Vite server on `127.0.0.1:4175`. Tests run in Chromium at desktop,
 tablet, and mobile sizes. Quote tests cover billing totals and validation, catalog creation, saved
 drafts, mouse dragging, actual touch events with a short handle hold, keyboard/tap addition, PDF
-download and export retry, and overflow. Health tests cover loading, success, error/retry, malformed
+download and export retry, and overflow. PDF checks cover Logi branding and recovery from unavailable
+logo/font assets. Health tests cover loading, success, error/retry, malformed
 responses, navigation, and keyboard focus. API responses are controlled in the browser, so this
 command does not need a backend. The full-stack root's `npm run smoke` verifies the real HTTP
 integration. Test failure screenshots and traces go to a temporary directory printed with the
@@ -118,7 +119,10 @@ purpose-specific `.ts` modules under `src/shared/utils`; use `.tsx` only for fil
 Create domain-named feature folders and add only the files their behavior requires. The existing
 `catalog` feature owns products and licenses; `quotes` owns draft editing, validation, integer-cent
 totals, storage, and PDF export. `health` owns the operational API connection check. Heavy PDF code
-loads only on export; its Unicode font and license are in `public/fonts/`.
+loads only on export; its regular/bold fonts and license are in `public/fonts/`. Customer quotations
+use the original Logi logo in `public/branding/`, with the source recorded beside the asset. The
+PDF has a formal item table, payment summary, repeated headers, and page numbers; it bundles its
+assets locally and does not contact Logi's website during export.
 
 ## Styling location
 

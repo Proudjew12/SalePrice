@@ -1,17 +1,27 @@
 import type { jsPDF } from "jspdf";
 
-const LEFT = 18;
-const RIGHT = 192;
-const BOTTOM = 272;
-const LINE_HEIGHT = 5;
+export type PdfColor = [number, number, number];
+export type PdfWeight = "normal" | "bold";
+
+export const PDF_PAGE = { left: 18, right: 192, width: 174, bottom: 273 };
+export const PDF_COLORS = {
+  ink: [48, 58, 64] as PdfColor,
+  muted: [103, 117, 124] as PdfColor,
+  accent: [50, 192, 204] as PdfColor,
+  line: [216, 226, 230] as PdfColor,
+  soft: [244, 247, 248] as PdfColor,
+};
 
 export function cleanPdfText(value: string): string {
   return Array.from(value.replaceAll("\r\n", "\n").replaceAll("\t", " "))
     .filter((character) => {
       const code = character.codePointAt(0) ?? 0;
       return character === "\n" || (code >= 32 && code !== 127);
-    })
-    .join("");
+    }).join("");
+}
+
+export function cleanPdfField(value: string): string {
+  return cleanPdfText(value).replace(/\s+/gu, " ").trim();
 }
 
 function isRtl(value: string): boolean {
@@ -20,39 +30,45 @@ function isRtl(value: string): boolean {
 }
 
 export class QuotePdfLayout {
-  y = 28;
+  y = 20;
 
-  constructor(private readonly document: jsPDF, private readonly reference: string) {}
+  constructor(
+    readonly document: jsPDF,
+    private readonly reference: string,
+    private readonly logo: Uint8Array,
+  ) {}
 
-  ensureSpace(height: number): void {
-    if (this.y + height <= BOTTOM) return;
-    this.document.addPage();
-    this.document.setFontSize(9);
-    this.document.setTextColor(105, 114, 130);
-    this.document.text("SalePrice / Quote", LEFT, 17);
-    const referenceLines = this.wrap(this.reference, 102, 8);
-    referenceLines.forEach((line, index) => {
-      const width = this.document.getTextWidth(line);
-      this.text(line, RIGHT - width, 17 + index * 4, width, 8);
-    });
-    this.y = Math.max(30, 22 + referenceLines.length * 4);
+  font(size: number, weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
+    this.document.setFont("DejaVuSans", weight);
+    this.document.setFontSize(size);
+    this.document.setTextColor(...color);
   }
 
-  text(value: string, x: number, y: number, width: number, size = 10): void {
+  text(value: string, x: number, y: number, width: number, size = 9,
+    weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
     const text = cleanPdfText(value);
     const rtl = isRtl(text);
-    this.document.setFontSize(size);
+    this.font(size, weight, color);
     this.document.text(text, rtl ? x + width : x, y, {
       align: rtl ? "right" : "left",
-      isInputVisual: false,
-      isOutputVisual: true,
-      isInputRtl: rtl,
-      isOutputRtl: false,
+      isInputVisual: false, isOutputVisual: true, isInputRtl: rtl, isOutputRtl: false,
     });
   }
 
-  wrap(value: string, width = RIGHT - LEFT, size = 10): string[] {
-    this.document.setFontSize(size);
+  right(value: string, x: number, y: number, width: number, size = 9,
+    weight: PdfWeight = "normal", color: PdfColor = PDF_COLORS.ink): void {
+    const text = cleanPdfText(value);
+    this.font(size, weight, color);
+    const textWidth = this.document.getTextWidth(text);
+    if (textWidth > width) this.document.setFontSize(size * width / textWidth);
+    this.document.text(text, x + width, y, {
+      align: "right",
+      isInputVisual: false, isOutputVisual: true, isInputRtl: isRtl(text), isOutputRtl: false,
+    });
+  }
+
+  wrap(value: string, width = PDF_PAGE.width, size = 9, weight: PdfWeight = "normal"): string[] {
+    this.font(size, weight);
     const result: unknown = this.document.splitTextToSize(cleanPdfText(value), width);
     if (!Array.isArray(result) || !result.every((line): line is string => typeof line === "string")) {
       throw new Error("The PDF text could not be prepared. Please try again.");
@@ -60,52 +76,56 @@ export class QuotePdfLayout {
     return result;
   }
 
-  paragraph(value: string, size = 10, color: [number, number, number] = [40, 49, 66]): void {
-    const lines = this.wrap(value, RIGHT - LEFT, size);
-    const lineHeight = Math.max(LINE_HEIGHT, size * 0.5);
-    this.document.setTextColor(...color);
-    for (const line of lines) {
-      this.ensureSpace(lineHeight);
-      this.document.setTextColor(...color);
-      this.text(line, LEFT, this.y, RIGHT - LEFT, size);
-      this.y += lineHeight;
+  logoAt(x: number, y: number, width: number): void {
+    this.document.addImage(this.logo, "PNG", x, y, width, width * 300 / 800, "logi-logo", "FAST");
+  }
+
+  rule(y = this.y, x = PDF_PAGE.left, width = PDF_PAGE.width, accent = false): void {
+    this.document.setDrawColor(...(accent ? PDF_COLORS.accent : PDF_COLORS.line));
+    this.document.setLineWidth(accent ? 0.55 : 0.2);
+    this.document.line(x, y, x + width, y);
+  }
+
+  fill(x: number, y: number, width: number, height: number, color = PDF_COLORS.soft): void {
+    this.document.setFillColor(...color);
+    this.document.rect(x, y, width, height, "F");
+  }
+
+  ensureSpace(height: number): boolean {
+    if (this.y + height <= PDF_PAGE.bottom) return false;
+    this.document.addPage();
+    this.logoAt(PDF_PAGE.left - 0.5, 12, 34);
+    this.right("SOFTWARE LICENSE QUOTATION", 97, 17, 95, 8, "bold");
+    const references = this.wrap(this.reference, 85, 7.5);
+    references.forEach((line, index) => this.right(line, 107, 23 + index * 4, 85, 7.5, "normal", PDF_COLORS.muted));
+    this.y = Math.max(34, 29 + references.length * 4);
+    this.rule(this.y - 4);
+    return true;
+  }
+
+  paragraph(value: string, size = 9, color = PDF_COLORS.ink): void {
+    const height = size * 0.3528 * 1.5;
+    for (const line of this.wrap(value, PDF_PAGE.width, size)) {
+      this.ensureSpace(height);
+      this.text(line, PDF_PAGE.left, this.y, PDF_PAGE.width, size, "normal", color);
+      this.y += height;
     }
   }
 
   label(value: string): void {
-    this.ensureSpace(12);
-    this.paragraph(value.toUpperCase(), 8, [105, 114, 130]);
-    this.y += 1;
-  }
-
-  rule(): void {
-    this.document.setDrawColor(223, 228, 236);
-    this.document.line(LEFT, this.y, RIGHT, this.y);
+    this.ensureSpace(13);
+    this.text(value.toUpperCase(), PDF_PAGE.left, this.y, PDF_PAGE.width, 7.5, "bold", PDF_COLORS.muted);
     this.y += 7;
-  }
-
-  amount(label: string, amount: string, emphasis = false): void {
-    this.ensureSpace(11);
-    const size = emphasis ? 12 : 10;
-    this.document.setTextColor(40, 49, 66);
-    this.text(label, LEFT, this.y, 92, size);
-    this.document.setFontSize(size);
-    const width = this.document.getTextWidth(amount);
-    this.document.text(amount, RIGHT, this.y, {
-      align: "right",
-      horizontalScale: width > 70 ? 70 / width : 1,
-    });
-    this.y += emphasis ? 11 : 8;
   }
 
   finish(): void {
     const count = this.document.getNumberOfPages();
     for (let page = 1; page <= count; page += 1) {
       this.document.setPage(page);
-      this.document.setFontSize(8);
-      this.document.setTextColor(105, 114, 130);
-      this.document.text("SalePrice | USD | Taxes not included", LEFT, 285);
-      this.document.text(`${page} / ${count}`, RIGHT, 285, { align: "right" });
+      this.rule(282);
+      this.text("Logi", PDF_PAGE.left, 288, 12, 8, "bold");
+      this.text("www.logi-ltd.co.il", 33, 288, 70, 7.5, "normal", PDF_COLORS.muted);
+      this.right(`Page ${page} of ${count}`, 147, 288, 45, 7.5, "normal", PDF_COLORS.muted);
     }
   }
 }

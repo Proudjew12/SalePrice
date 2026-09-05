@@ -178,8 +178,10 @@ where supported, with a standard native selector as the fallback.
 **New Order** retains the confirmation before clearing an edited draft. Catalog management controls
 are shown only in Edit Mode, and each visit starts in Normal Mode. Catalog storage uses a version 2
 snapshot so removed initial entries stay removed. Existing version 1 custom entries are migrated,
-with the old storage entry retained for recovery. The PDF retains its bundled Unicode font and print
-layout, with a blue SalePrice heading.
+with the old storage entry retained for recovery. Customer PDFs use Logi branding, an original
+transparent logo, embedded regular/bold fonts, a license table with repeated headers, a payment
+summary, and numbered pages. Long names and notes wrap across pages, and monthly versus annual
+prices remain explicit. PDF filenames use `Logi-<reference>.pdf`; the app itself remains SalePrice.
 
 ## GitHub Pages
 
