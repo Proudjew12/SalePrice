@@ -31,7 +31,7 @@ export function LicenseCard({ product, license, onAdd, billing, editing, onEdit 
     <article className={styles.card} aria-label={license.name}>
       <button ref={ref} type="button"
         className={classNames(styles.content, editing && styles.editable, isDragging && styles.dragging)}
-        aria-label={`Add ${license.name} to quote`} aria-describedby="catalog-card-instructions"
+        aria-label={`Add ${license.name} to quote`}
         onPointerDown={() => { dragged.current = false; }}
         onClick={(event) => {
           // A completed or canceled drag must not also act as a click on the card.

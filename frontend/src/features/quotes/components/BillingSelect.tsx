@@ -4,14 +4,13 @@ import styles from "./BillingSelect.module.scss";
 
 interface BillingSelectProps {
   id?: string;
-  describedBy?: string;
   value: BillingOption;
   onChange: (value: BillingOption) => void;
 }
 
-export function BillingSelect({ id, describedBy, value, onChange }: BillingSelectProps) {
+export function BillingSelect({ id, value, onChange }: BillingSelectProps) {
   return (
-    <select id={id} aria-describedby={describedBy} className={styles.select} value={value} onChange={(event) => {
+    <select id={id} className={styles.select} value={value} onChange={(event) => {
       const option = BILLING_OPTIONS.find((candidate) => candidate.id === event.target.value);
       if (option) onChange(option.id);
     }}>

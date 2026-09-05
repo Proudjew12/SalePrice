@@ -1,6 +1,5 @@
 import { DragDropProvider } from "@dnd-kit/react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 import { Icon } from "@/components/ui/Icon";
 import { CatalogDialog } from "@/features/catalog/components/CatalogDialog";
@@ -83,7 +82,7 @@ export function QuoteWorkspace() {
         event.preventDefault(); document.getElementById("quote-content")?.focus();
       }}>Skip to main content</a>
       <header className={styles.header}>
-        <Link className={styles.brand} to="/" aria-label="SalePrice home"><span>S</span>SalePrice</Link>
+        <div className={styles.brand}><span aria-hidden="true">S</span>SalePrice</div>
         <div className={styles.toolbar}>
           <TextSizeControl />
           <button type="button" className={styles.mode} aria-pressed={editing} title={editing ? "Switch to Normal Mode" : "Switch to Edit Mode"} onClick={() => setEditing(!editing)}>

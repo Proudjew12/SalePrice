@@ -164,15 +164,15 @@ and tablet requirement without a native app or Expo. Revisit persistence and API
 shared accounts or durable quote history become requirements.
 
 The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
-list. The header contains the SalePrice logo, a percentage-only text-size selector from 50% to 150%
-in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
+list. The header displays the SalePrice logo as plain branding, a percentage-only text-size selector
+from 50% to 150% in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
 the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts use the system font.
 The selector scales content text while preserving touch targets and readable header controls; it
 does not change browser zoom or the PDF's print size. Its setting is saved separately from quote
 data on this device. If browser storage is unavailable, changes still apply for the current visit.
 
-Catalog and order billing selectors share clear labels, explanatory subscription terms, and the same
-soft menu styling. They use the [customizable native picker](https://developer.chrome.com/blog/a-customizable-select)
+Catalog and order billing selectors share clear labels and the same soft menu styling. They use the
+[customizable native picker](https://developer.chrome.com/blog/a-customizable-select)
 where supported, with a standard native selector as the fallback.
 
 **New Order** retains the confirmation before clearing an edited draft. Catalog management controls

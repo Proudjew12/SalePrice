@@ -1,5 +1,4 @@
 import type { MouseEvent, ReactNode } from "react";
-import { Link } from "react-router-dom";
 
 import { env } from "@/shared/config/env";
 import styles from "@/components/layout/AppShell.module.scss";
@@ -22,9 +21,9 @@ export function AppShell({ children }: AppShellProps) {
         Skip to main content
       </a>
       <header className={styles.header}>
-        <Link className={styles.brand} to="/" aria-label={`${env.appName} home`}>
+        <span className={styles.brand}>
           {env.appName}
-        </Link>
+        </span>
       </header>
       <main className={styles.main} id="main-content" tabIndex={-1}>
         {children}
