@@ -1,6 +1,11 @@
+import type { BillingOption } from "@/features/quotes/types";
+
+export type LicensePrices = Record<BillingOption, string>;
+
 export interface CatalogLicense {
   id: string;
   name: string;
+  prices?: LicensePrices;
 }
 
 export interface CatalogProduct {
@@ -10,10 +15,9 @@ export interface CatalogProduct {
   licenses: CatalogLicense[];
 }
 
-export interface CustomCatalog {
-  version: 1;
+export interface CatalogSnapshot {
+  version: 2;
   products: CatalogProduct[];
-  licenses: { productId: string; license: CatalogLicense }[];
 }
 
 export type CatalogChangeResult =
@@ -22,7 +26,9 @@ export type CatalogChangeResult =
 
 export const CATALOG_LIMITS = {
   name: 80,
-  customProducts: 20,
-  extraLicenses: 100,
-  licensesPerProduct: 30,
+  shortName: 4,
+  products: 50,
+  licensesPerProduct: 100,
+  licenses: 2000,
+  storedCharacters: 1_000_000,
 } as const;

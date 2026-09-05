@@ -11,6 +11,7 @@ const paths = {
   chevron: "m6 9 6 6 6-6",
   arrow: "M5 12h14m-6-6 6 6-6 6",
   trash: "M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7",
+  edit: "m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z",
   monitor: "M3 3h18v14H3zM12 17v4M8 21h8",
 } as const;
 

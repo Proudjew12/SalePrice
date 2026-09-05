@@ -11,20 +11,19 @@ interface Props {
   quote: ReturnType<typeof useQuoteDraft>;
   exporting: boolean;
   onExport: () => void;
-  onNewQuote: () => void;
+  onNewOrder: () => void;
   catalogWarning: string | null;
   exportError: string;
 }
 
-export function QuoteCanvas({ quote, exporting, onExport, onNewQuote, catalogWarning, exportError }: Props) {
+export function QuoteCanvas({ quote, exporting, onExport, onNewOrder, catalogWarning, exportError }: Props) {
   const { ref, isDropTarget } = useDroppable({ id: "quote-items", accept: "license" });
   const { draft } = quote;
   return (
-    <main className={styles.quote} id="quote-content" tabIndex={-1}>
+    <main className={styles.quote} id="quote-content" aria-label="Order" tabIndex={-1}>
       <div className={styles.scroll}>
-        <div className={styles.quoteHeading}>
-          <h1>Your quote</h1><span>{draft.lines.length} {draft.lines.length === 1 ? "license" : "licenses"}</span>
-          <button className={styles.newQuote} type="button" onClick={onNewQuote}><Icon name="plus" size={17} />New quote</button>
+        <div className={styles.orderActions}>
+          <button className={styles.newOrder} type="button" onClick={onNewOrder}><Icon name="plus" size={17} />New Order</button>
         </div>
         {quote.warning ? <div className={styles.warning} role="alert">{quote.warning}<button type="button" onClick={quote.dismissWarning} aria-label="Dismiss draft warning"><Icon name="close" size={16} /></button></div> : null}
         {catalogWarning ? <p className={styles.warning} role="alert">{catalogWarning}</p> : null}

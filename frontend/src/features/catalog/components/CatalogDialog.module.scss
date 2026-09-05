@@ -9,12 +9,13 @@
   font-size: var(--font-size-body);
   line-height: 1.5;
   max-height: calc(100dvh - 32px);
-  max-width: 460px;
-  padding: 26px;
+  max-width: 540px;
+  overflow-wrap: anywhere;
+  padding: 20px;
   width: calc(100vw - 32px);
 
   &::backdrop { background: var(--color-overlay); }
-  form { display: grid; gap: 10px; }
+  form { display: grid; gap: 16px; }
   label { font-size: var(--font-size-body); }
   input {
     background: var(--color-surface);
@@ -23,10 +24,10 @@
     box-shadow: var(--shadow-control);
     color: var(--color-text);
     font: inherit;
-    margin-bottom: 8px;
-    min-height: 46px;
+    min-height: 44px;
     min-width: 0;
-    padding: 10px 12px;
+    padding: 8px 10px;
+    width: 100%;
   }
   input:hover { border-color: var(--color-border-strong); }
   input:focus-visible { @include mixins.focus-ring; border-color: var(--color-accent); }
@@ -37,10 +38,28 @@
 .header h2 { font-size: var(--font-size-section-title); font-weight: 600; line-height: 1.35; margin: 0; }
 .close { align-items: center; background: transparent; border: 0; color: var(--color-text-muted); cursor: pointer; display: flex; justify-content: center; min-height: 44px; min-width: 44px; }
 .close:hover { background: var(--color-accent-soft); border-radius: var(--radius-control); color: var(--color-accent); }
-.description { color: var(--color-text-muted); font-size: var(--font-size-body); line-height: 1.5; margin: 12px 0 24px; }
+.description { color: var(--color-text-muted); font-size: var(--font-size-body); line-height: 1.5; margin: 4px 0 20px; }
+.field { display: grid; gap: 6px; min-width: 0; }
+.hint { color: var(--color-text-muted); font-size: var(--font-size-caption); line-height: 1.45; margin: 0; }
+.prices { border: 0; border-top: 1px solid var(--color-border); display: grid; gap: 12px; margin: 0; min-width: 0; padding: 12px 0 0; }
+.prices legend { font-size: var(--font-size-body); font-weight: 600; padding: 0 8px 0 0; }
+.priceHelp { color: var(--color-text-muted); font-size: var(--font-size-caption); margin: 0; }
+.priceField { align-items: center; display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 140px); }
+.priceInput { min-width: 0; position: relative; }
+.priceInput span { color: var(--color-text-muted); left: 10px; pointer-events: none; position: absolute; top: 50%; transform: translateY(-50%); }
+.priceInput input { padding-left: 28px; }
 .error { color: var(--color-danger); font-size: var(--font-size-body); margin: 0; }
-.actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
-.actions button { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-control); box-shadow: var(--shadow-control); color: var(--color-text); cursor: pointer; font: inherit; min-height: 44px; padding: 9px 16px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+.actions button { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-control); box-shadow: var(--shadow-control); color: var(--color-text); cursor: pointer; font: inherit; min-height: 44px; padding: 8px 12px; }
 .actions button:hover { background: var(--color-accent-soft); border-color: var(--color-accent); }
+.actions .delete { border-color: transparent; box-shadow: none; color: var(--color-danger); margin-right: auto; }
+.actions .delete:hover { background: color-mix(in srgb, var(--color-danger) 7%, var(--color-surface)); border-color: var(--color-danger); }
 .actions .submit { background: var(--gradient-action); border-color: transparent; color: var(--color-accent-contrast); }
 .actions .submit:hover { background: var(--color-accent-strong); border-color: var(--color-accent-strong); }
+
+@media (max-width: 480px) {
+  .dialog { padding: 16px; }
+  .priceField { gap: 6px; grid-template-columns: minmax(0, 1fr); }
+  .actions button { flex: 1; }
+  .actions .delete { flex-basis: 100%; }
+}

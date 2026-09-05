@@ -13,9 +13,12 @@ interface CatalogPanelProps {
   onBillingChange: (billing: BillingOption) => void;
   onAdd: (product: CatalogProduct, license: CatalogLicense) => void;
   onAddLicense: () => void;
+  editing: boolean;
+  onEditProduct: () => void;
+  onEditLicense: (license: CatalogLicense) => void;
 }
 
-export function CatalogPanel({ product, billing, onBillingChange, onAdd, onAddLicense }: CatalogPanelProps) {
+export function CatalogPanel({ product, billing, onBillingChange, onAdd, onAddLicense, editing, onEditProduct, onEditLicense }: CatalogPanelProps) {
   const [search, setSearch] = useState("");
   const licenses = product.licenses.filter((license) => license.name.toLowerCase().includes(search.trim().toLowerCase()));
   const billingDescription = BILLING_OPTIONS.find((option) => option.id === billing)?.description;
@@ -24,7 +27,7 @@ export function CatalogPanel({ product, billing, onBillingChange, onAdd, onAddLi
     <section className={styles.panel} aria-label="Licenses">
       <header className={styles.heading}>
         <h2>{product.name}</h2>
-        <p>Choose a license</p>
+        {editing ? <button type="button" className={styles.editProduct} onClick={onEditProduct} aria-label="Edit product" title="Edit product"><Icon name="edit" size={18} /></button> : null}
       </header>
       <div className={styles.search}>
         <Icon name="search" />
@@ -42,13 +45,13 @@ export function CatalogPanel({ product, billing, onBillingChange, onAdd, onAddLi
       <p className={styles.billingHint}>{billingDescription}</p>
       <div className={styles.licenses}>
         {licenses.length > 0 ? licenses.map((license) => (
-          <LicenseCard key={license.id} product={product} license={license} onAdd={onAdd} />
-        )) : <p className={styles.empty} role="status">No licenses match your search.</p>}
+          <LicenseCard key={license.id} product={product} license={license} billing={billing} editing={editing} onEdit={() => onEditLicense(license)} onAdd={onAdd} />
+        )) : <p className={styles.empty} role="status">{product.licenses.length === 0 ? "No licenses yet" : "No licenses match your search."}</p>}
       </div>
       <p className={styles.instruction}>Drag by the handle, or tap + to add. On touchscreens, hold the handle first.</p>
-      <button type="button" className={styles.addLicense} onClick={onAddLicense}>
+      {editing ? <button type="button" className={styles.addLicense} onClick={onAddLicense}>
         <Icon name="plus" /> Add license
-      </button>
+      </button> : null}
     </section>
   );
 }

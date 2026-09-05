@@ -1,4 +1,4 @@
-export const TEXT_SIZES = [90, 100, 110, 120] as const;
+export const TEXT_SIZES = [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150] as const;
 export type TextSize = typeof TEXT_SIZES[number];
 
 const STORAGE_KEY = "saleprice.display.v1";

@@ -5,9 +5,10 @@
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
+  gap: 4px;
   min-height: 0;
   overflow-y: auto;
-  padding-block: 28px;
+  padding: 10px 6px;
   scrollbar-width: thin;
 }
 
@@ -15,69 +16,39 @@
 .add {
   align-items: center;
   background: transparent;
-  border: 0;
-  border-left: 3px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
   color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
   font-size: var(--font-size-caption);
-  gap: 10px;
+  gap: 3px;
   justify-content: center;
-  line-height: 1.5;
-  min-height: 102px;
-  padding: 12px 4px;
+  line-height: 1.2;
+  min-height: 56px;
+  padding: 6px 2px;
+  position: relative;
   width: 100%;
 
-  &:hover {
-    background: var(--color-accent-soft);
-    color: var(--color-accent);
-  }
-
-  &:focus-visible {
-    @include mixins.focus-ring;
-    outline-offset: -4px;
-  }
+  span { max-width: 100%; overflow-wrap: anywhere; }
+  &:hover { background: var(--color-surface); color: var(--color-text); }
+  &:focus-visible { @include mixins.focus-ring; outline-offset: -2px; }
 }
 
 .selected {
   background: var(--color-accent-soft);
-  border-left-color: var(--color-accent);
   color: var(--color-accent);
+
+  &::before { background: var(--color-accent); border-radius: 2px; content: ""; height: 20px; left: -4px; position: absolute; width: 3px; }
 }
 
-.add {
-  border-top: 1px solid var(--color-border);
-  margin-top: 20px;
-  min-height: 82px;
-}
+.add { border-color: var(--color-border); margin-top: 8px; min-height: 44px; }
 
-@media (max-width: 1100px) {
-  .rail { padding-block: 18px; }
-  .product { min-height: 90px; }
-}
-
-@media (max-width: 699px) {
-  .rail {
-    border-bottom: 1px solid var(--color-border);
-    border-right: 0;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0;
-  }
-
-  .product,
-  .add {
-    border-bottom: 3px solid transparent;
-    border-left: 0;
-    flex-basis: 76px;
-    gap: 5px;
-    min-height: 78px;
-    padding: 10px 8px;
-  }
-
-  .selected { border-bottom-color: var(--color-accent); }
-  .add { border-top: 0; margin-top: 0; }
+@media (max-width: 700px) {
+  .rail { border-bottom: 1px solid var(--color-border); border-right: 0; flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 6px 10px; }
+  .product, .add { flex-basis: 52px; width: 52px; }
+  .selected::before { bottom: 0; height: 3px; left: 16px; width: 20px; }
+  .add { margin: 0 0 0 6px; }
 }

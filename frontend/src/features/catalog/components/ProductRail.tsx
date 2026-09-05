@@ -8,11 +8,12 @@ interface ProductRailProps {
   selectedId: string;
   onSelect: (id: string) => void;
   onAddProduct: () => void;
+  editing: boolean;
 }
 
 function ProductGlyph({ id }: { id: string }) {
   return (
-    <svg width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+    <svg width="23" height="23" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
       {id === "microsoft-365" ? (
         <>
           <rect x="3" y="3" width="10" height="10" rx="1.4" />
@@ -33,7 +34,7 @@ function ProductGlyph({ id }: { id: string }) {
   );
 }
 
-export function ProductRail({ products, selectedId, onSelect, onAddProduct }: ProductRailProps) {
+export function ProductRail({ products, selectedId, onSelect, onAddProduct, editing }: ProductRailProps) {
   return (
     <nav className={styles.rail} aria-label="Products">
       {products.map((product) => (
@@ -50,10 +51,9 @@ export function ProductRail({ products, selectedId, onSelect, onAddProduct }: Pr
           <span>{product.shortName}</span>
         </button>
       ))}
-      <button type="button" className={styles.add} onClick={onAddProduct} aria-label="Add product" title="Add product">
+      {editing ? <button type="button" className={styles.add} onClick={onAddProduct} aria-label="Add product" title="Add product">
         <Icon name="plus" />
-        <span>Add</span>
-      </button>
+      </button> : null}
     </nav>
   );
 }

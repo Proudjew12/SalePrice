@@ -95,5 +95,5 @@ test("supports the keyboard skip link and recovers from an unknown route", async
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await page.getByRole("link", { name: "Return home" }).click();
   await expect(page).toHaveURL(/\/#\/$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Your quote" })).toBeVisible();
+  await expect(page.getByRole("main", { name: "Order", exact: true })).toBeVisible();
 });

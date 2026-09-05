@@ -2,48 +2,43 @@
 
 .card {
   align-items: center;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
+  border-bottom: 1px solid var(--color-border);
   display: grid;
-  gap: 8px;
-  grid-template-columns: 32px minmax(0, 1fr) 44px;
-  min-height: 122px;
-  padding: 16px 12px;
+  gap: 4px;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  min-height: 64px;
+  padding: 6px 4px;
   touch-action: pan-y;
 
-  &:hover { border-color: var(--color-border-strong); }
+  &:last-child { border-bottom: 0; }
+  &:hover { background: color-mix(in srgb, var(--color-accent-soft) 35%, transparent); }
 }
 
-.dragging,
-.dragging:hover { border-color: var(--color-accent); opacity: 0.65; }
+.dragging { background: var(--color-accent-soft); opacity: 0.65; }
 .content { min-width: 0; }
-.content h3 { font-size: var(--font-size-card-title); font-weight: 600; line-height: 1.35; margin: 0 0 3px; overflow-wrap: anywhere; }
-.content p { color: var(--color-text-muted); font-size: var(--font-size-body); line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
-.content .hint { font-size: var(--font-size-caption); margin-top: 10px; }
+.content h3 { font-size: var(--font-size-body); font-weight: 600; line-height: 1.35; margin: 0; overflow-wrap: anywhere; }
+.content p { color: var(--color-text-muted); font-size: var(--font-size-caption); font-variant-numeric: tabular-nums; line-height: 1.4; margin: 3px 0 0; }
+.actions { display: flex; }
 
 .drag,
-.add {
+.add,
+.edit {
   align-items: center;
   background: transparent;
   border: 0;
+  border-radius: var(--radius-control);
   color: var(--color-text-muted);
   cursor: pointer;
   display: flex;
   justify-content: center;
   min-height: 44px;
   padding: 0;
+  width: 44px;
 
-  &:focus-visible { @include mixins.focus-ring; }
+  &:hover { background: var(--color-accent-soft); color: var(--color-accent); }
+  &:focus-visible { @include mixins.focus-ring; outline-offset: -2px; }
 }
 
-.drag { cursor: grab; margin-inline: -6px; touch-action: none; width: 44px; }
-.drag:hover { color: var(--color-accent); }
+.drag { cursor: grab; touch-action: none; }
 .drag:active { cursor: grabbing; }
-.add { border: 1px solid var(--color-accent); border-radius: 50%; color: var(--color-accent); height: 40px; min-height: 44px; width: 44px; }
-.add:hover { background: var(--color-accent-soft); border-color: var(--color-accent-strong); color: var(--color-accent-strong); }
-
-@media (max-width: 1100px) {
-  .card { gap: 4px; grid-template-columns: 30px minmax(0, 1fr) 44px; padding: 14px 8px; }
-}
+.add { color: var(--color-accent); }

@@ -26,6 +26,15 @@ async function expectAmount(page: Page, name: string, value: string): Promise<vo
   await expect(page.getByLabel(name, { exact: true })).toHaveText(value);
 }
 
+async function saveBasicDefaultPrice(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  await page.getByRole("button", { name: "Edit Business Basic", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Edit license", exact: true });
+  await dialog.getByLabel("Annual paid monthly price", { exact: true }).fill("15.50");
+  await dialog.getByRole("button", { name: "Save changes", exact: true }).click();
+  await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
+}
+
 test("starts empty, switches products, and searches licenses without requiring the API", async ({ page }) => {
   const apiRequests: string[] = [];
   page.on("request", (request) => {
@@ -33,7 +42,8 @@ test("starts empty, switches products, and searches licenses without requiring t
   });
   await page.goto("/");
   await expect(page).toHaveTitle("SalePrice");
-  await expect(page.getByRole("heading", { name: "Your quote", level: 1 })).toBeVisible();
+  await expect(page.getByRole("main", { name: "Order", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your quote" })).toHaveCount(0);
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Export PDF", exact: true })).toBeDisabled();
 
@@ -184,7 +194,7 @@ test("keeps quoting available when browser storage is blocked", async ({ page })
     Storage.prototype.setItem = () => { throw new DOMException("Storage blocked", "QuotaExceededError"); };
   });
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Your quote" })).toBeVisible();
+  await expect(page.getByRole("main", { name: "Order", exact: true })).toBeVisible();
   const line = await addLicense(page, "Business Basic");
   await priceLine(line, "2", "15");
   await expectAmount(page, "Monthly payments", "$30.00");
@@ -193,6 +203,7 @@ test("keeps quoting available when browser storage is blocked", async ({ page })
 
 test("adds custom products and licenses and retains them after reload", async ({ page }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
   await page.getByRole("button", { name: "Add product", exact: true }).click();
   const productDialog = page.getByRole("dialog", { name: "Add product", exact: true });
   await productDialog.getByLabel("Product name", { exact: true }).fill("A Product");
@@ -215,6 +226,7 @@ test("adds custom products and licenses and retains them after reload", async ({
 test("drags a license into the quote with a real mouse gesture", async ({ page, isMobile }) => {
   test.skip(isMobile, "This scenario verifies desktop mouse input.");
   await page.goto("/");
+  await saveBasicDefaultPrice(page);
   const handle = page.getByRole("button", { name: "Drag Business Basic", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
   await expect(handle).toBeVisible();
@@ -226,12 +238,14 @@ test("drags a license into the quote with a real mouse gesture", async ({ page, 
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
   await page.mouse.up();
   await expect(quoteLine(page, "Business Basic")).toBeVisible();
+  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(15.5);
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
 });
 
 test("supports real tablet finger dragging and tap-to-add", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "tablet", "This scenario verifies tablet touchscreen input.");
   await page.goto("/");
+  await saveBasicDefaultPrice(page);
   const handle = page.getByRole("button", { name: "Drag Business Basic", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
   const sourceBox = await handle.boundingBox();
@@ -255,6 +269,7 @@ test("supports real tablet finger dragging and tap-to-add", async ({ page, conte
     await session.detach();
   }
   await expect(quoteLine(page, "Business Basic")).toBeVisible();
+  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(15.5);
   await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).tap();
   await expect(quoteLine(page, "Business Standard")).toBeVisible();
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
@@ -263,7 +278,8 @@ test("supports real tablet finger dragging and tap-to-add", async ({ page, conte
 test("scrolls tablet license cards with a finger without accidentally adding them", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "tablet", "This scenario verifies native tablet scrolling.");
   await page.goto("/");
-  for (let index = 1; index <= 8; index += 1) {
+  await page.getByRole("button", { name: "Normal Mode", exact: true }).click();
+  for (let index = 1; index <= 16; index += 1) {
     await page.getByRole("button", { name: "Add license", exact: true }).click();
     const dialog = page.getByRole("dialog", { name: "Add license", exact: true });
     await dialog.getByLabel("License name", { exact: true }).fill(`Tablet license ${index}`);

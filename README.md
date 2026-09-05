@@ -18,17 +18,23 @@ SalePrice/
 
 For sellers quoting licenses from multiple companies:
 
-1. Choose a product from the left rail and a license from its catalog. Search the catalog or add
-   your own products and licenses.
+1. In **Normal Mode**, choose a product from the compact left rail and search its license list.
+   Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
+   entries. Product short labels can also be changed.
 2. Choose monthly paid monthly, annual paid monthly, or annual paid upfront. Drag the license into
    the quote, or use its **+** button. On a tablet, briefly hold the drag handle before moving it.
-3. Enter quantities, your own unit prices, customer, quote reference, and optional notes.
+3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
+   default USD price for each billing schedule; adding it fills in the matching price. Override
+   that price in the order whenever needed.
 4. Review monthly payments, annual upfront charges, the amount due at the start, and a 12-month
    estimate; download the customer PDF using the button at the bottom.
 
 The initial catalog includes Microsoft 365, Google Workspace, Adobe Acrobat, and Zoom Workplace.
 These are unpriced starting names, not a live price feed. Confirm each vendor's applicable plans
-and billing terms before quoting. Custom catalog entries are saved locally.
+and billing terms before quoting. All catalog edits and default prices are saved locally. A blank
+default price means manual entry; zero is a valid price. Editing or deleting a catalog entry leaves
+existing order items intact. Deleting the last product or license is supported; Edit Mode can add
+entries again. The catalog supports 50 products, 100 licenses per product, and 2,000 licenses total.
 
 Monthly schedules use a price per license **per month**; annual upfront uses a price per license
 **per year**. Changing a quote line's billing schedule clears its price so it must be re-entered.
@@ -44,7 +50,8 @@ locally bundled code and fonts without sending quote data to a server.
 
 Acceptance checks cover desktop mouse drag, tablet press-and-drag and tap, keyboard addition,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive
-layout, saved text-size preferences, and production hosting from a repository subpath without an API.
+layout, saved text-size preferences, catalog editing/default prices/migration, and production hosting
+from a repository subpath without an API.
 
 ## Start
 
@@ -148,15 +155,19 @@ bundled, licensed Unicode font for downloadable, paginated documents. React web 
 and tablet requirement without a native app or Expo. Revisit persistence and API contracts when
 shared accounts or durable quote history become requirements.
 
-The interface uses soft gray surfaces, navy text, blue accents, and restrained shadows. A compact
-header contains the SalePrice logo and a **Text size** selector with 90%, 100%, 110%, and 120% options.
-Text uses the device's system font with consistent heading, body, and caption sizes. The selector
-scales text across the application while preserving touch targets; it does not change browser zoom
-or the PDF's print size. Its setting is saved separately from quote data on this device. If browser
-storage is unavailable, the selected size still applies for the current visit.
+The interface uses soft gray surfaces, navy text, blue accents, and a compact product rail and license
+list. The header contains the SalePrice logo, a percentage-only text-size selector from 50% to 150%
+in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
+the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts use the system font.
+The selector scales content text while preserving touch targets and readable header controls; it
+does not change browser zoom or the PDF's print size. Its setting is saved separately from quote
+data on this device. If browser storage is unavailable, changes still apply for the current visit.
 
-**New quote** sits beside the quote heading and retains the confirmation before clearing an edited
-draft. The PDF retains its bundled Unicode font and print layout, with a blue SalePrice heading.
+**New Order** retains the confirmation before clearing an edited draft. Catalog management controls
+are shown only in Edit Mode, and each visit starts in Normal Mode. Catalog storage uses a version 2
+snapshot so removed initial entries stay removed. Existing version 1 custom entries are migrated,
+with the old storage entry retained for recovery. The PDF retains its bundled Unicode font and print
+layout, with a blue SalePrice heading.
 
 ## GitHub Pages
 

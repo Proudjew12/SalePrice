@@ -1,26 +1,60 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-import { catalogProducts, loadCatalog, saveCatalog, validCatalogName } from "../storage";
+import { loadCatalog, saveCatalog } from "../storage";
 import { CATALOG_LIMITS } from "../types";
-import type { CatalogChangeResult, CatalogProduct, CustomCatalog } from "../types";
+import type { CatalogChangeResult, CatalogProduct, CatalogSnapshot, LicensePrices } from "../types";
+import { isLicensePrices, validCatalogName, validShortName } from "../validation";
+
+function normalizedPrices(prices: LicensePrices): LicensePrices {
+  return {
+    monthly: prices.monthly.trim(),
+    "annual-monthly": prices["annual-monthly"].trim(),
+    "annual-upfront": prices["annual-upfront"].trim(),
+  };
+}
+
+const PRICE_ERROR = "Enter USD prices from 0 to 1,000,000 with up to two decimal places, or leave them blank.";
 
 export function useCatalog() {
   const [state, setState] = useState(loadCatalog);
-  const products = catalogProducts(state.custom);
+  const current = useRef(state.catalog);
 
-  function commit(custom: CustomCatalog): void {
-    const saved = saveCatalog(custom);
-    setState({ custom, warning: saved ? null : "Your catalog is available for this visit, but could not be saved on this device." });
+  function commit(products: CatalogProduct[]): void {
+    const catalog: CatalogSnapshot = { version: 2, products };
+    current.current = catalog;
+    const saved = saveCatalog(catalog);
+    setState({
+      catalog,
+      warning: saved ? null : "Your catalog is available for this visit, but could not be saved on this device.",
+    });
   }
 
-  function addProduct(name: string, firstLicense: string): CatalogChangeResult {
+  function licenseLimitReached(product?: CatalogProduct): boolean {
+    return (product !== undefined && product.licenses.length >= CATALOG_LIMITS.licensesPerProduct) ||
+      current.current.products.reduce((total, entry) => total + entry.licenses.length, 0) >= CATALOG_LIMITS.licenses;
+  }
+
+  function addProduct(
+    name: string, firstLicense: string, shortName?: string, prices?: LicensePrices,
+  ): CatalogChangeResult {
     const productName = name.trim();
     const licenseName = firstLicense.trim();
+    const label = shortName?.trim() ||
+      [...productName.replace(/\s+/g, "").toUpperCase()].slice(0, 2).join("");
     if (!validCatalogName(productName) || !validCatalogName(licenseName)) {
       return { ok: false, message: "Enter a product and license name, each up to 80 characters." };
     }
-    if (state.custom.products.length >= CATALOG_LIMITS.customProducts) {
-      return { ok: false, message: "You can add up to 20 custom products on this device." };
+    if (!validShortName(label)) {
+      return { ok: false, message: "Enter a short label from 1 to 4 characters." };
+    }
+    const defaults = prices === undefined ? undefined : normalizedPrices(prices);
+    if (defaults !== undefined && !isLicensePrices(defaults)) return { ok: false, message: PRICE_ERROR };
+    const products = current.current.products;
+    if (products.length >= CATALOG_LIMITS.products) {
+      return { ok: false, message: "The catalog supports up to 50 products on this device." };
+    }
+    if (licenseLimitReached()) {
+      return { ok: false, message: "The catalog supports up to 2,000 licenses on this device." };
     }
     if (products.some((product) => product.name.toLowerCase() === productName.toLowerCase())) {
       return { ok: false, message: "A product with this name already exists." };
@@ -28,31 +62,106 @@ export function useCatalog() {
     const product: CatalogProduct = {
       id: `custom-${crypto.randomUUID()}`,
       name: productName,
-      shortName: [...productName.replace(/\s+/g, "").toUpperCase()].slice(0, 2).join(""),
-      licenses: [{ id: `custom-${crypto.randomUUID()}`, name: licenseName }],
+      shortName: label,
+      licenses: [{
+        id: `custom-${crypto.randomUUID()}`,
+        name: licenseName,
+        ...(defaults === undefined ? {} : { prices: defaults }),
+      }],
     };
-    commit({ ...state.custom, products: [...state.custom.products, product] });
+    commit([...products, product]);
     return { ok: true, productId: product.id };
   }
 
-  function addLicense(productId: string, name: string): CatalogChangeResult {
+  function addLicense(productId: string, name: string, prices?: LicensePrices): CatalogChangeResult {
     const licenseName = name.trim();
+    const products = current.current.products;
     const product = products.find((candidate) => candidate.id === productId);
     if (!product) return { ok: false, message: "Select a product before adding a license." };
     if (!validCatalogName(licenseName)) return { ok: false, message: "Enter a license name up to 80 characters." };
     if (product.licenses.some((license) => license.name.toLowerCase() === licenseName.toLowerCase())) {
       return { ok: false, message: "This product already has a license with that name." };
     }
-    if (product.licenses.length >= CATALOG_LIMITS.licensesPerProduct ||
-      state.custom.licenses.length >= CATALOG_LIMITS.extraLicenses) {
-      return { ok: false, message: "The catalog supports 30 licenses per product and 100 additional licenses." };
+    if (licenseLimitReached(product)) {
+      return { ok: false, message: "The catalog supports 100 licenses per product and 2,000 licenses in total." };
     }
-    commit({
-      ...state.custom,
-      licenses: [...state.custom.licenses, { productId, license: { id: `custom-${crypto.randomUUID()}`, name: licenseName } }],
-    });
+    const defaults = prices === undefined ? undefined : normalizedPrices(prices);
+    if (defaults !== undefined && !isLicensePrices(defaults)) return { ok: false, message: PRICE_ERROR };
+    const license = {
+      id: `custom-${crypto.randomUUID()}`,
+      name: licenseName,
+      ...(defaults === undefined ? {} : { prices: defaults }),
+    };
+    commit(products.map((entry) => entry.id === productId
+      ? { ...entry, licenses: [...entry.licenses, license] } : entry));
     return { ok: true, productId };
   }
 
-  return { products, warning: state.warning, addProduct, addLicense };
+  function updateProduct(productId: string, name: string, shortName: string): CatalogChangeResult {
+    const productName = name.trim();
+    const label = shortName.trim();
+    const products = current.current.products;
+    if (!products.some((product) => product.id === productId)) {
+      return { ok: false, message: "This product is no longer in the catalog." };
+    }
+    if (!validCatalogName(productName)) return { ok: false, message: "Enter a product name up to 80 characters." };
+    if (!validShortName(label)) return { ok: false, message: "Enter a short label from 1 to 4 characters." };
+    if (products.some((product) => product.id !== productId &&
+      product.name.toLowerCase() === productName.toLowerCase())) {
+      return { ok: false, message: "A product with this name already exists." };
+    }
+    commit(products.map((product) => product.id === productId
+      ? { ...product, name: productName, shortName: label } : product));
+    return { ok: true, productId };
+  }
+
+  function updateLicense(
+    productId: string, licenseId: string, name: string, prices: LicensePrices,
+  ): CatalogChangeResult {
+    const licenseName = name.trim();
+    const products = current.current.products;
+    const product = products.find((entry) => entry.id === productId);
+    if (!product?.licenses.some((license) => license.id === licenseId)) {
+      return { ok: false, message: "This license is no longer in the catalog." };
+    }
+    if (!validCatalogName(licenseName)) return { ok: false, message: "Enter a license name up to 80 characters." };
+    if (product.licenses.some((license) => license.id !== licenseId &&
+      license.name.toLowerCase() === licenseName.toLowerCase())) {
+      return { ok: false, message: "This product already has a license with that name." };
+    }
+    const defaults = normalizedPrices(prices);
+    if (!isLicensePrices(defaults)) return { ok: false, message: PRICE_ERROR };
+    commit(products.map((entry) => entry.id === productId ? {
+      ...entry,
+      licenses: entry.licenses.map((license) => license.id === licenseId
+        ? { ...license, name: licenseName, prices: defaults } : license),
+    } : entry));
+    return { ok: true, productId };
+  }
+
+  function removeProduct(productId: string): CatalogChangeResult {
+    const products = current.current.products;
+    if (!products.some((product) => product.id === productId)) {
+      return { ok: false, message: "This product is no longer in the catalog." };
+    }
+    commit(products.filter((product) => product.id !== productId));
+    return { ok: true, productId };
+  }
+
+  function removeLicense(productId: string, licenseId: string): CatalogChangeResult {
+    const products = current.current.products;
+    const product = products.find((entry) => entry.id === productId);
+    if (!product?.licenses.some((license) => license.id === licenseId)) {
+      return { ok: false, message: "This license is no longer in the catalog." };
+    }
+    commit(products.map((entry) => entry.id === productId
+      ? { ...entry, licenses: entry.licenses.filter((license) => license.id !== licenseId) } : entry));
+    return { ok: true, productId };
+  }
+
+  return {
+    products: state.catalog.products,
+    warning: state.warning,
+    addProduct, addLicense, updateProduct, updateLicense, removeProduct, removeLicense,
+  };
 }

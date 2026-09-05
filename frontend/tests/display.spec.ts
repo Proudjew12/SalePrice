@@ -15,9 +15,11 @@ async function expectNoHorizontalOverflow(page: Page): Promise<void> {
 test("resizes readable text without losing quote edits and remembers the selection", async ({ page }) => {
   await page.goto("/");
   const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
-  const heading = page.getByRole("heading", { name: "Your quote", level: 1 });
+  const heading = page.getByRole("heading", { name: "Microsoft 365", exact: true });
   const customer = page.getByLabel("Customer", { exact: true });
   await expect(textSize).toHaveValue("100");
+  await expect(page.getByText("Text size", { exact: true })).toBeHidden();
+  await expect(textSize.locator("option")).toHaveText(["50%", "60%", "70%", "80%", "90%", "100%", "110%", "120%", "130%", "140%", "150%"]);
   const initialHeadingSize = await fontSize(heading);
   const initialInputSize = await fontSize(customer);
   await customer.fill("Display settings customer");
@@ -27,7 +29,7 @@ test("resizes readable text without losing quote edits and remembers the selecti
   await line.getByLabel("Quantity", { exact: true }).fill("3");
   await line.getByRole("textbox", { name: /^Unit price/ }).fill("12.50");
 
-  for (const size of [90, 110, 120]) {
+  for (const size of [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]) {
     await textSize.selectOption(String(size));
     await expect(textSize).toHaveValue(String(size));
     await expect.poll(async () => (await fontSize(heading)) / initialHeadingSize).toBeCloseTo(size / 100, 2);
@@ -39,8 +41,8 @@ test("resizes readable text without losing quote edits and remembers the selecti
   }
 
   await page.reload();
-  await expect(textSize).toHaveValue("120");
-  await expect.poll(async () => (await fontSize(heading)) / initialHeadingSize).toBeCloseTo(1.2, 2);
+  await expect(textSize).toHaveValue("150");
+  await expect.poll(async () => (await fontSize(heading)) / initialHeadingSize).toBeCloseTo(1.5, 2);
   await expect(customer).toHaveValue("Display settings customer");
   await expect(page.getByLabel("Quote reference", { exact: true })).toHaveValue("DISPLAY-001");
   await expect(line.getByLabel("Quantity", { exact: true })).toHaveValue("3");
@@ -49,32 +51,32 @@ test("resizes readable text without losing quote edits and remembers the selecti
   await expectNoHorizontalOverflow(page);
 });
 
-test("keeps new quote confirmation usable at the largest text size", async ({ page }) => {
+test("keeps New Order confirmation usable at the largest text size", async ({ page }) => {
   await page.goto("/");
   const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
-  await textSize.selectOption("120");
+  await textSize.selectOption("150");
   await page.getByLabel("Customer", { exact: true }).fill("Keep until confirmed");
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
-  const newQuote = page.getByRole("button", { name: "New quote", exact: true });
-  await expect(newQuote).toBeVisible();
+  const newOrder = page.getByRole("button", { name: "New Order", exact: true });
+  await expect(newOrder).toBeVisible();
   page.once("dialog", (dialog) => dialog.dismiss());
-  await newQuote.click();
+  await newOrder.click();
   await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("Keep until confirmed");
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
   page.once("dialog", (dialog) => dialog.accept());
-  await newQuote.click();
+  await newOrder.click();
   await expect(page.getByLabel("Customer", { exact: true })).toHaveValue("");
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
-  await expect(textSize).toHaveValue("120");
+  await expect(textSize).toHaveValue("150");
   await expectNoHorizontalOverflow(page);
   await page.reload();
-  await expect(textSize).toHaveValue("120");
+  await expect(textSize).toHaveValue("150");
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
 });
 
 for (const preference of [
   { name: "malformed JSON", value: "{invalid" },
-  { name: "unsupported text size", value: JSON.stringify({ textSize: 130 }) },
+  { name: "unsupported text size", value: JSON.stringify({ textSize: 155 }) },
   { name: "invalid preference type", value: JSON.stringify({ textSize: "110" }) },
   { name: "missing preference object", value: "null" },
 ]) {
@@ -84,7 +86,7 @@ for (const preference of [
     });
     await page.goto("/");
     const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
-    const heading = page.getByRole("heading", { name: "Your quote", level: 1 });
+    const heading = page.getByRole("heading", { name: "Microsoft 365", exact: true });
     await expect(textSize).toHaveValue("100");
     const initialSize = await fontSize(heading);
     await textSize.selectOption("110");
@@ -102,12 +104,12 @@ test("allows resizing and quoting when browser storage is unavailable", async ({
   });
   await page.goto("/");
   const textSize = page.getByRole("combobox", { name: "Text size", exact: true });
-  const heading = page.getByRole("heading", { name: "Your quote", level: 1 });
+  const heading = page.getByRole("heading", { name: "Microsoft 365", exact: true });
   await expect(textSize).toHaveValue("100");
   const initialSize = await fontSize(heading);
-  await textSize.selectOption("120");
-  await expect(textSize).toHaveValue("120");
-  await expect.poll(async () => (await fontSize(heading)) / initialSize).toBeCloseTo(1.2, 2);
+  await textSize.selectOption("150");
+  await expect(textSize).toHaveValue("150");
+  await expect.poll(async () => (await fontSize(heading)) / initialSize).toBeCloseTo(1.5, 2);
   await page.getByRole("button", { name: "Add Business Basic to quote", exact: true }).click();
   const line = page.getByRole("group", { name: "Business Basic", exact: true });
   await line.getByLabel("Quantity", { exact: true }).fill("2");
