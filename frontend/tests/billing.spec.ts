@@ -18,13 +18,17 @@ test("chooses every billing schedule from the open picker with mouse or touch at
   await dialog.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
   await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
-  const picker = page.getByRole("region", { name: "Licenses", exact: true }).getByRole("combobox", { name: "Billing Option", exact: true });
+  await expect(page.getByRole("region", { name: "Licenses", exact: true }).getByRole("combobox")).toHaveCount(0);
 
   for (const option of [
     { label: "Annual — Pay Upfront", value: "annual-upfront", price: 120 },
     { label: "Monthly — Pay Monthly", value: "monthly", price: 12.5 },
     { label: "Annual — Pay Monthly", value: "annual-monthly", price: 10 },
   ]) {
+    await press(page.getByRole("button", { name: "Add Business Basic to quote", exact: true }), hasTouch);
+    const line = page.getByTestId("quote-line").last();
+    const picker = line.getByRole("combobox", { name: "Billing Option", exact: true });
+    await expect(picker).toHaveValue("annual-monthly");
     await press(picker, hasTouch);
     const choice = picker.getByRole("option", { name: option.label, exact: true });
     await expect(choice).toBeVisible();
@@ -35,8 +39,6 @@ test("chooses every billing schedule from the open picker with mouse or touch at
     expect(fitsViewport, `${option.label} must remain inside the viewport`).toBe(true);
     await press(choice, hasTouch);
     await expect(picker).toHaveValue(option.value);
-    await press(page.getByRole("button", { name: "Add Business Basic to quote", exact: true }), hasTouch);
-    const line = page.getByTestId("quote-line").last();
     await expect(line.getByRole("combobox", { name: "Billing Option", exact: true })).toHaveValue(option.value);
     expect(Number(await line.getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(option.price);
   }

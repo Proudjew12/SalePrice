@@ -3,6 +3,8 @@ export type BillingOption = "monthly" | "annual-monthly" | "annual-upfront";
 export interface QuoteLine {
   id: string;
   productId: string;
+  // Older saved lines have no catalog link and keep manual prices.
+  licenseId?: string;
   productName: string;
   licenseName: string;
   billing: BillingOption;

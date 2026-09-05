@@ -77,11 +77,10 @@ test("edits built-in names and billing prices without changing existing order li
   await expectPrice(original, 8.25);
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
 
-  const billing = page.getByRole("region", { name: "Licenses", exact: true }).getByRole("combobox", { name: "Billing Option", exact: true });
   for (const [schedule, price] of [["monthly", 18.75], ["annual-monthly", 12.5], ["annual-upfront", 130]] as const) {
-    await billing.selectOption(schedule);
     await page.getByRole("button", { name: "Add Core seat to quote", exact: true }).click();
     const line = page.getByRole("group", { name: "Core seat", exact: true }).last();
+    await line.getByRole("combobox", { name: "Billing Option", exact: true }).selectOption(schedule);
     await expect(line.getByRole("combobox", { name: "Billing Option", exact: true })).toHaveValue(schedule);
     await expectPrice(line, price);
   }
@@ -143,13 +142,12 @@ test("saves default prices on new products and licenses, including zero and the 
   await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
   await expect(page.getByRole("group", { name: "Support seat", exact: true }).getByRole("textbox", { name: /^Unit price/ })).toHaveValue("");
   await page.getByRole("button", { name: "Remove Support seat", exact: true }).click();
-  const billing = page.getByRole("region", { name: "Licenses", exact: true }).getByRole("combobox", { name: "Billing Option", exact: true });
-  await billing.selectOption("monthly");
   await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
+  await page.getByRole("group", { name: "Support seat", exact: true }).getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("monthly");
   await expectPrice(page.getByRole("group", { name: "Support seat", exact: true }), 0);
   await expect(page.getByRole("button", { name: "Export PDF", exact: true })).toBeEnabled();
-  await billing.selectOption("annual-upfront");
   await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).click();
+  await page.getByRole("group", { name: "Support seat", exact: true }).last().getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
   await expectPrice(page.getByRole("group", { name: "Support seat", exact: true }).last(), 1000000);
   await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$1,000,000.00");
 });

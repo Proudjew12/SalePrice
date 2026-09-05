@@ -17,6 +17,8 @@ function isStoredLine(value: unknown): value is QuoteLine {
     isRecord(value) &&
     isText(value.id, QUOTE_LIMITS.id) && value.id.length > 0 &&
     isText(value.productId, QUOTE_LIMITS.id) &&
+    (value.licenseId === undefined ||
+      (isText(value.licenseId, QUOTE_LIMITS.id) && value.licenseId.length > 0)) &&
     isText(value.productName, QUOTE_LIMITS.name) &&
     isText(value.licenseName, QUOTE_LIMITS.name) &&
     BILLING_OPTIONS.some((option) => option.id === value.billing) &&

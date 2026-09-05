@@ -42,13 +42,6 @@
   input::placeholder { color: var(--color-text-muted); opacity: 1; }
 }
 
-.billing {
-  display: grid;
-  font-size: var(--font-size-body);
-  gap: 4px;
-  margin-bottom: 14px;
-}
-
 .licenses { display: grid; gap: 8px; }
 .empty { color: var(--color-text-muted); font-size: var(--font-size-body); padding: 16px; }
 

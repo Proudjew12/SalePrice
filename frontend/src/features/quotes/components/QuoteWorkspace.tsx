@@ -10,15 +10,15 @@ import { useCatalog } from "@/features/catalog/hooks/useCatalog";
 import type { CatalogLicense, CatalogProduct } from "@/features/catalog/types";
 import { TextSizeControl } from "@/features/display/TextSizeControl";
 import { QuoteCanvas } from "@/features/quotes/components/QuoteCanvas";
-import type { BillingOption } from "@/features/quotes/types";
 import { useQuoteDraft } from "@/features/quotes/useQuoteDraft";
 import styles from "@/features/quotes/components/QuoteWorkspace.module.scss";
 
+const initialBilling = "annual-monthly";
+
 export function QuoteWorkspace() {
-  const quote = useQuoteDraft();
   const catalog = useCatalog();
+  const quote = useQuoteDraft(catalog.products);
   const [selectedId, setSelectedId] = useState("microsoft-365");
-  const [billing, setBilling] = useState<BillingOption>("annual-monthly");
   const [editing, setEditing] = useState(false);
   const [dialog, setDialog] = useState<CatalogDialogTarget | null>(null);
   const [exporting, setExporting] = useState(false);
@@ -27,7 +27,7 @@ export function QuoteWorkspace() {
   const product = catalog.products.find((item) => item.id === selectedId) ?? catalog.products[0];
 
   function addLicense(selectedProduct: CatalogProduct, license: CatalogLicense) {
-    const added = quote.addLine(selectedProduct.id, selectedProduct.name, license.name, billing, license.prices?.[billing] ?? "");
+    const added = quote.addLine(selectedProduct.id, selectedProduct.name, license.name, initialBilling, license.prices?.[initialBilling] ?? "", license.id);
     setMessage(added ? `${license.name} added to your quote.` : "A quote can contain up to 100 license lines.");
     setExportError("");
   }
@@ -100,7 +100,7 @@ export function QuoteWorkspace() {
       }}>
         <div className={styles.body}>
           <ProductRail products={catalog.products} selectedId={product?.id ?? ""} onSelect={setSelectedId} editing={editing} onAddProduct={() => setDialog({ kind: "add-product" })} />
-          {product ? <CatalogPanel key={product.id} product={product} billing={billing} onBillingChange={setBilling} onAdd={addLicense} editing={editing}
+          {product ? <CatalogPanel key={product.id} product={product} billing={initialBilling} onAdd={addLicense} editing={editing}
             onAddLicense={() => setDialog({ kind: "add-license", product })} onEditProduct={() => setDialog({ kind: "edit-product", product })}
             onEditLicense={(license) => setDialog({ kind: "edit-license", product, license })} />
             : <section className={styles.emptyCatalog} aria-label="Licenses"><h2>No products yet</h2><p>{editing ? "Use + on the left to add your first product." : "Switch to Edit Mode to add a product."}</p></section>}

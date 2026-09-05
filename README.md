@@ -21,8 +21,9 @@ For sellers quoting licenses from multiple companies:
 1. In **Normal Mode**, choose a product from the compact left rail and search its license list.
    Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
    entries. Product short labels can also be changed.
-2. Choose **Monthly — Pay Monthly**, **Annual — Pay Monthly**, or **Annual — Pay Upfront**. Drag the license into
-   the quote, or click or tap its card. On a tablet, briefly hold the card before moving it;
+2. Drag a license into the quote, or click or tap its card. New items start with **Annual — Pay Monthly**;
+   choose **Monthly — Pay Monthly** or **Annual — Pay Upfront** on the order item when needed.
+   On a tablet, briefly hold the card before moving it;
    swipe immediately to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
 3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
    default USD price for each billing schedule; adding it fills in the matching price. Override
@@ -40,7 +41,9 @@ existing order items intact. Deleting the last product or license is supported; 
 entries again. The catalog supports 50 products, 100 licenses per product, and 2,000 licenses total.
 
 Monthly schedules use a price per license **per month**; annual upfront uses a price per license
-**per year**. Changing a quote line's billing schedule clears its price so it must be re-entered.
+**per year**. Changing a quote line's billing schedule applies the matching saved catalog price,
+or clears the price for manual entry when none is available. Existing drafts without a catalog
+license link also clear their price on a billing change. Catalog edits do not reprice existing lines.
 Quantities are whole numbers from 1–9,999; prices allow zero through $1,000,000 with up to two decimal
 places. Calculations use integer cents. Quotes support up to 100 lines and exclude taxes. The
 12-month estimate assumes monthly subscriptions continue for all 12 months.
@@ -171,7 +174,7 @@ The selector scales content text while preserving touch targets and readable hea
 does not change browser zoom or the PDF's print size. Its setting is saved separately from quote
 data on this device. If browser storage is unavailable, changes still apply for the current visit.
 
-Catalog and order billing selectors share clear labels and the same soft menu styling. They use the
+Billing selectors appear on order items, with clear labels and soft menu styling. They use the
 [customizable native picker](https://developer.chrome.com/blog/a-customizable-select)
 where supported, with a standard native selector as the fallback.
 

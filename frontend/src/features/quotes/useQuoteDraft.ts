@@ -1,11 +1,12 @@
 import { useCallback, useRef, useState } from "react";
 
+import type { CatalogProduct } from "@/features/catalog/types";
 import { parsePriceCents } from "@/features/quotes/calculations";
 import { createDraft, formatQuoteReference, loadDraft, saveDraft } from "@/features/quotes/storage";
 import type { BillingOption, QuoteDraft, QuoteLine } from "@/features/quotes/types";
 import { createId } from "@/shared/utils/createId";
 
-export function useQuoteDraft() {
+export function useQuoteDraft(products: readonly CatalogProduct[]) {
   const [state, setState] = useState(() => ({ ...loadDraft(), saveFailed: false }));
   const current = useRef(state.draft);
 
@@ -16,10 +17,14 @@ export function useQuoteDraft() {
     setState((previous) => ({ ...previous, draft: next, saveFailed: !saved }));
   }, []);
 
-  function addLine(productId: string, productName: string, licenseName: string, billing: BillingOption, initialPrice = "") {
+  function addLine(
+    productId: string, productName: string, licenseName: string,
+    billing: BillingOption, initialPrice = "", licenseId?: string,
+  ) {
     if (current.current.lines.length >= 100) return false;
     commit((draft) => ({ ...draft, lines: [...draft.lines, {
       id: createId(), productId, productName, licenseName, billing,
+      ...(licenseId === undefined ? {} : { licenseId }),
       quantity: "1", unitPrice: parsePriceCents(initialPrice) === null ? "" : initialPrice,
     }] }));
     return true;
@@ -28,8 +33,15 @@ export function useQuoteDraft() {
   function editLine(id: string, patch: Partial<Pick<QuoteLine, "quantity" | "unitPrice" | "billing">>) {
     commit((draft) => ({ ...draft, lines: draft.lines.map((line) => {
       if (line.id !== id) return line;
-      // A different payment schedule requires its own price; never silently reuse a monthly rate.
-      const price = patch.billing && patch.billing !== line.billing ? "" : line.unitPrice;
+      let price = line.unitPrice;
+      if (patch.billing && patch.billing !== line.billing) {
+        // Match stable IDs only; renamed or removed entries must not inherit another license's rate.
+        const license = line.licenseId === undefined ? undefined : products
+          .find((product) => product.id === line.productId)?.licenses
+          .find((entry) => entry.id === line.licenseId);
+        const savedPrice = license?.prices?.[patch.billing] ?? "";
+        price = parsePriceCents(savedPrice) === null ? "" : savedPrice;
+      }
       return { ...line, unitPrice: price, ...patch };
     }) }));
   }
