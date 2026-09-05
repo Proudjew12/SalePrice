@@ -44,6 +44,21 @@ reverse proxy or set the variable to the deployed API origin before building.
 If a local backend uses a non-default address, set `VITE_DEV_API_PROXY_TARGET` to its origin. The
 root launcher supplies this automatically from the backend's validated `APP_HOST` and `APP_PORT`.
 
+### Preview on a tablet
+
+For a device on the same local network, replace `YOUR_LAN_IP` with this computer's local IPv4
+address (shown by `ip -4 address` on Linux), then run:
+
+```bash
+npm run dev -- --host YOUR_LAN_IP --port 5182
+```
+
+Open `http://YOUR_LAN_IP:5182/` on the tablet while the computer and server stay running. This
+serves the current local code without publishing to GitHub Pages. Each browser keeps its own
+draft and catalog. Quote and catalog IDs support local HTTP using the browser's
+[`getRandomValues`](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/getRandomValues)
+when `randomUUID` is unavailable.
+
 ## GitHub Pages
 
 The root `.github/workflows/deploy-pages.yml` publishes this app from `frontend/dist`. Enable

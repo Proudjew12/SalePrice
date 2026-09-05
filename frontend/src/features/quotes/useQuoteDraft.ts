@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { parsePriceCents } from "@/features/quotes/calculations";
 import { createDraft, formatQuoteReference, loadDraft, saveDraft } from "@/features/quotes/storage";
 import type { BillingOption, QuoteDraft, QuoteLine } from "@/features/quotes/types";
+import { createId } from "@/shared/utils/createId";
 
 export function useQuoteDraft() {
   const [state, setState] = useState(() => ({ ...loadDraft(), saveFailed: false }));
@@ -18,7 +19,7 @@ export function useQuoteDraft() {
   function addLine(productId: string, productName: string, licenseName: string, billing: BillingOption, initialPrice = "") {
     if (current.current.lines.length >= 100) return false;
     commit((draft) => ({ ...draft, lines: [...draft.lines, {
-      id: crypto.randomUUID(), productId, productName, licenseName, billing,
+      id: createId(), productId, productName, licenseName, billing,
       quantity: "1", unitPrice: parsePriceCents(initialPrice) === null ? "" : initialPrice,
     }] }));
     return true;

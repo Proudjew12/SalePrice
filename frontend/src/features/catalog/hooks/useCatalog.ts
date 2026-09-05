@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 
+import { createId } from "@/shared/utils/createId";
+
 import { loadCatalog, saveCatalog } from "../storage";
 import { CATALOG_LIMITS } from "../types";
 import type { CatalogChangeResult, CatalogProduct, CatalogSnapshot, LicensePrices } from "../types";
@@ -60,11 +62,11 @@ export function useCatalog() {
       return { ok: false, message: "A product with this name already exists." };
     }
     const product: CatalogProduct = {
-      id: `custom-${crypto.randomUUID()}`,
+      id: `custom-${createId()}`,
       name: productName,
       shortName: label,
       licenses: [{
-        id: `custom-${crypto.randomUUID()}`,
+        id: `custom-${createId()}`,
         name: licenseName,
         ...(defaults === undefined ? {} : { prices: defaults }),
       }],
@@ -88,7 +90,7 @@ export function useCatalog() {
     const defaults = prices === undefined ? undefined : normalizedPrices(prices);
     if (defaults !== undefined && !isLicensePrices(defaults)) return { ok: false, message: PRICE_ERROR };
     const license = {
-      id: `custom-${crypto.randomUUID()}`,
+      id: `custom-${createId()}`,
       name: licenseName,
       ...(defaults === undefined ? {} : { prices: defaults }),
     };
