@@ -2,12 +2,12 @@ import { DragDropProvider } from "@dnd-kit/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Icon } from "@/components/ui/Icon";
 import { CatalogDialog } from "@/features/catalog/components/CatalogDialog";
 import { CatalogPanel } from "@/features/catalog/components/CatalogPanel";
 import { ProductRail } from "@/features/catalog/components/ProductRail";
 import { useCatalog } from "@/features/catalog/hooks/useCatalog";
 import type { CatalogLicense, CatalogProduct } from "@/features/catalog/types";
+import { TextSizeControl } from "@/features/display/TextSizeControl";
 import { QuoteCanvas } from "@/features/quotes/components/QuoteCanvas";
 import type { BillingOption } from "@/features/quotes/types";
 import { useQuoteDraft } from "@/features/quotes/useQuoteDraft";
@@ -68,9 +68,7 @@ export function QuoteWorkspace() {
       }}>Skip to main content</a>
       <header className={styles.header}>
         <Link className={styles.brand} to="/" aria-label="SalePrice home"><span>S</span>SalePrice</Link>
-        <span className={styles.title}>Quote builder</span>
-        <span className={styles.saved}><Icon name="check" size={15} />{quote.saved ? "Saved on this device" : "Draft on this device"}</span>
-        <button className={styles.newQuote} type="button" onClick={newQuote}><Icon name="plus" size={17} />New quote</button>
+        <TextSizeControl />
       </header>
       <DragDropProvider onDragEnd={(event) => {
         if (event.canceled || event.operation.target?.id !== "quote-items") return;
@@ -84,7 +82,7 @@ export function QuoteWorkspace() {
           <ProductRail products={catalog.products} selectedId={product.id} onSelect={setSelectedId} onAddProduct={() => setDialog("product")} />
           <CatalogPanel key={product.id} product={product} billing={billing} onBillingChange={setBilling} onAdd={addLicense} onAddLicense={() => setDialog("license")} />
           <QuoteCanvas quote={quote} exporting={exporting} onExport={() => { void exportPdf(); }}
-            catalogWarning={catalog.warning} exportError={exportError} />
+            catalogWarning={catalog.warning} exportError={exportError} onNewQuote={newQuote} />
         </div>
       </DragDropProvider>
       <div className={styles.announcement} role="status" aria-live="polite" aria-atomic="true">{message}</div>

@@ -1,17 +1,18 @@
+@use "./functions" as functions;
+
 $colors: (
-  background: #fff,
-  surface: #fff,
-  rail: #f8fbff,
-  catalog: #fcfdff,
-  text: #152536,
-  text-muted: #5c6d7e,
-  border: #dce5ef,
-  border-strong: #b4c5d7,
+  background: #e9edf1,
+  surface: #f1f3f5,
+  rail: #e4e9ee,
+  catalog: #edf0f3,
+  text: #243443,
+  text-muted: #536474,
+  border: #cbd3db,
+  border-strong: #9aaab9,
   accent: #005bea,
   accent-strong: #004bc2,
   accent-contrast: #fff,
-  accent-soft: #edf5ff,
-  "cyan": #43d4ff,
+  accent-soft: #e1ebf7,
   focus: #005bea,
   success: #167451,
   danger: #b42335,
@@ -35,8 +36,14 @@ $radii: (
 
 $gradients: (
   action: linear-gradient(110deg, #005bea, #087db1),
-  brand: linear-gradient(120deg, #005bea, #43d4ff),
-  canvas: (radial-gradient(ellipse at 100% 0, rgb(0 91 234 / 5%), transparent 60%), radial-gradient(ellipse at 0 90%, rgb(67 212 255 / 6%), transparent 60%)),
+);
+
+$font-sizes: (
+  caption: functions.rem(12, 14),
+  body: 1rem,
+  card-title: functions.rem(16, 14),
+  section-title: functions.rem(22, 14),
+  metric: functions.rem(20, 14),
 );
 
 $spacing: (

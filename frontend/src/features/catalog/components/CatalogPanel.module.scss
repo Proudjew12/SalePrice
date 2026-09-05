@@ -3,6 +3,8 @@
 .panel {
   background: var(--color-catalog);
   border-right: 1px solid var(--color-border);
+  font-size: var(--font-size-body);
+  line-height: 1.5;
   min-height: 0;
   min-width: 0;
   overflow-y: auto;
@@ -15,8 +17,8 @@
 .heading {
   margin-bottom: 22px;
 
-  h2 { font-size: clamp(23px, 2vw, 31px); font-weight: 600; line-height: 1.2; margin: 0 0 7px; overflow-wrap: anywhere; }
-  p { color: var(--color-text-muted); font-size: 16px; margin: 0; }
+  h2 { font-size: var(--font-size-section-title); font-weight: 600; line-height: 1.35; margin: 0 0 7px; overflow-wrap: anywhere; }
+  p { color: var(--color-text-muted); font-size: var(--font-size-body); margin: 0; }
 }
 
 .search {
@@ -42,7 +44,7 @@
 
 .billing {
   display: grid;
-  font-size: 14px;
+  font-size: var(--font-size-body);
   gap: 8px;
 
   select {
@@ -65,14 +67,14 @@
 .billingHint,
 .instruction {
   color: var(--color-text-muted);
-  font-size: 14px;
+  font-size: var(--font-size-caption);
   line-height: 1.5;
 }
 
 .billingHint { margin: 8px 0 22px; }
 .instruction { margin: 22px 0 14px; }
 .licenses { display: grid; gap: 10px; }
-.empty { color: var(--color-text-muted); font-size: 15px; padding-block: 20px; }
+.empty { color: var(--color-text-muted); font-size: var(--font-size-body); padding-block: 20px; }
 
 .addLicense {
   align-items: center;
@@ -97,10 +99,6 @@
 
 @media (max-width: 1100px) {
   .panel { padding: 24px 18px; }
-  .heading p { font-size: 14px; }
-  .search input { font-size: 14px; }
-  .billingHint,
-  .instruction { font-size: 13px; }
 }
 
 @media (max-width: 699px) {

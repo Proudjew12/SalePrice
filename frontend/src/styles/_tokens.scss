@@ -3,6 +3,10 @@
 :root {
   color-scheme: light;
 
+  @each $name, $value in variables.$font-sizes {
+    --font-size-#{$name}: #{$value};
+  }
+
   @each $name, $value in variables.$gradients {
     --gradient-#{$name}: #{$value};
   }

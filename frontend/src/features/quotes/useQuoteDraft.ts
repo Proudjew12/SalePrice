@@ -4,14 +4,14 @@ import { createDraft, loadDraft, saveDraft } from "@/features/quotes/storage";
 import type { BillingOption, QuoteDraft, QuoteLine } from "@/features/quotes/types";
 
 export function useQuoteDraft() {
-  const [state, setState] = useState(() => ({ ...loadDraft(), saved: false, saveFailed: false }));
+  const [state, setState] = useState(() => ({ ...loadDraft(), saveFailed: false }));
   const current = useRef(state.draft);
 
   const commit = useCallback((update: (previous: QuoteDraft) => QuoteDraft) => {
     const next = update(current.current);
     current.current = next;
     const saved = saveDraft(next);
-    setState((previous) => ({ ...previous, draft: next, saved, saveFailed: !saved }));
+    setState((previous) => ({ ...previous, draft: next, saveFailed: !saved }));
   }, []);
 
   function addLine(productId: string, productName: string, licenseName: string, billing: BillingOption) {

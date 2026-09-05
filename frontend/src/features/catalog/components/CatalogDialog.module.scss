@@ -6,6 +6,8 @@
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-panel);
   color: var(--color-text);
+  font-size: var(--font-size-body);
+  line-height: 1.5;
   max-height: calc(100dvh - 32px);
   max-width: 460px;
   padding: 26px;
@@ -13,7 +15,7 @@
 
   &::backdrop { background: var(--color-overlay); }
   form { display: grid; gap: 10px; }
-  label { font-size: 14px; }
+  label { font-size: var(--font-size-body); }
   input {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -32,11 +34,11 @@
 }
 
 .header { align-items: center; display: flex; gap: 12px; justify-content: space-between; }
-.header h2 { font-size: 24px; font-weight: 600; margin: 0; }
+.header h2 { font-size: var(--font-size-section-title); font-weight: 600; line-height: 1.35; margin: 0; }
 .close { align-items: center; background: transparent; border: 0; color: var(--color-text-muted); cursor: pointer; display: flex; justify-content: center; min-height: 44px; min-width: 44px; }
 .close:hover { background: var(--color-accent-soft); border-radius: var(--radius-control); color: var(--color-accent); }
-.description { color: var(--color-text-muted); font-size: 14px; line-height: 1.5; margin: 12px 0 24px; }
-.error { color: var(--color-danger); font-size: 14px; margin: 0; }
+.description { color: var(--color-text-muted); font-size: var(--font-size-body); line-height: 1.5; margin: 12px 0 24px; }
+.error { color: var(--color-danger); font-size: var(--font-size-body); margin: 0; }
 .actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
 .actions button { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-control); box-shadow: var(--shadow-control); color: var(--color-text); cursor: pointer; font: inherit; min-height: 44px; padding: 9px 16px; }
 .actions button:hover { background: var(--color-accent-soft); border-color: var(--color-accent); }

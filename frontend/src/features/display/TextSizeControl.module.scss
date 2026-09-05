@@ -1,0 +1,49 @@
+@use "../../styles/abstracts/mixins" as mixins;
+
+.control {
+  align-items: center;
+  color: var(--color-text-muted);
+  display: flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-body);
+  gap: 8px;
+  margin-left: auto;
+  position: relative;
+
+  select {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    color: var(--color-text);
+    cursor: pointer;
+    min-height: 44px;
+    padding: 6px 8px;
+
+    &:hover { border-color: var(--color-border-strong); }
+    &:focus-visible { @include mixins.focus-ring; }
+  }
+}
+
+.notice {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-card);
+  font-size: var(--font-size-caption);
+  padding: 8px 12px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  width: 210px;
+}
+
+@media (max-width: 360px) {
+  .control > span:first-child {
+    position: absolute;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
