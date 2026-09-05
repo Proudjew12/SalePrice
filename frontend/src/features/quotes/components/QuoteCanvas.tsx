@@ -41,7 +41,7 @@ export function QuoteCanvas({ quote, exporting, onExport, onNewOrder, catalogWar
           <div className={classNames(styles.dropzone, draft.lines.length === 0 && styles.empty)}>
             <span className={styles.dropIcon}><Icon name={draft.lines.length ? "plus" : "document"} size={26} /></span>
             <p>{isDropTarget ? "Release to add this license" : draft.lines.length ? "Drop another license here" : "Your next quote starts here"}</p>
-            {draft.lines.length === 0 ? <span>Drag a license from the left, or tap its + button.</span> : null}
+            {draft.lines.length === 0 ? <span>Drag a license card here, or click or tap it to add.</span> : null}
           </div>
         </section>
         <label className={styles.notes}>Notes<textarea value={draft.notes} maxLength={4000} placeholder="Add any notes for this quote…" rows={3}

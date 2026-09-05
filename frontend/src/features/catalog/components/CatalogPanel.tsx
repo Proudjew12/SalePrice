@@ -44,7 +44,7 @@ export function CatalogPanel({ product, billing, onBillingChange, onAdd, onAddLi
           <LicenseCard key={license.id} product={product} license={license} billing={billing} editing={editing} onEdit={() => onEditLicense(license)} onAdd={onAdd} />
         )) : <p className={styles.empty} role="status">{product.licenses.length === 0 ? "No licenses yet" : "No licenses match your search."}</p>}
       </div>
-      <p className={styles.instruction}>Drag by the handle, or tap + to add. On touchscreens, hold the handle first.</p>
+      <p id="catalog-card-instructions" className={styles.instruction}>Drag a card, or click or tap it to add. On touchscreens, hold the card briefly before dragging. You can also focus a card and press Enter.</p>
       {editing ? <button type="button" className={styles.addLicense} onClick={onAddLicense}>
         <Icon name="plus" /> Add license
       </button> : null}

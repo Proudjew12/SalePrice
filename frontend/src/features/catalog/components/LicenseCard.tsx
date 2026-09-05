@@ -1,4 +1,5 @@
-import { useDraggable } from "@dnd-kit/react";
+import { PointerSensor, useDragDropMonitor, useDraggable } from "@dnd-kit/react";
+import { useRef } from "react";
 
 import { Icon } from "@/components/ui/Icon";
 import { formatMoney, parsePriceCents } from "@/features/quotes/calculations";
@@ -17,24 +18,30 @@ interface LicenseCardProps {
 }
 
 export function LicenseCard({ product, license, onAdd, billing, editing, onEdit }: LicenseCardProps) {
-  const { ref, handleRef, isDragging } = useDraggable({ id: license.id, type: "license" });
+  const { ref, isDragging, isDropping } = useDraggable({ id: license.id, type: "license", sensors: [PointerSensor] });
+  const dragged = useRef(false);
+  useDragDropMonitor({
+    onDragStart(event) {
+      if (event.operation.source?.id === license.id) dragged.current = true;
+    },
+  });
   const price = parsePriceCents(license.prices?.[billing] ?? "");
 
   return (
-    <article ref={ref} className={classNames(styles.card, isDragging && styles.dragging)} aria-label={license.name}>
-      <button ref={handleRef} type="button" className={styles.drag} aria-label={`Drag ${license.name}`} title="Drag to your quote">
-        <Icon name="grip" size={14} />
+    <article className={styles.card} aria-label={license.name}>
+      <button ref={ref} type="button"
+        className={classNames(styles.content, editing && styles.editable, isDragging && styles.dragging)}
+        aria-label={`Add ${license.name} to quote`} aria-describedby="catalog-card-instructions"
+        onPointerDown={() => { dragged.current = false; }}
+        onClick={(event) => {
+          // A completed or canceled drag must not also act as a click on the card.
+          if (event.defaultPrevented || isDragging || isDropping || (event.detail > 0 && dragged.current)) return;
+          onAdd(product, license);
+        }}>
+        <span className={styles.name}>{license.name}</span>
+        <span className={styles.price}>{price === null ? "Price not set" : `${formatMoney(price)} / ${billing === "annual-upfront" ? "year" : "month"}`}</span>
       </button>
-      <div className={styles.content}>
-        <h3>{license.name}</h3>
-        <p>{price === null ? "Price not set" : `${formatMoney(price)} / ${billing === "annual-upfront" ? "year" : "month"}`}</p>
-      </div>
-      <div className={styles.actions}>
-        {editing ? <button type="button" className={styles.edit} aria-label={`Edit ${license.name}`} title="Edit license" onClick={onEdit}><Icon name="edit" size={17} /></button> : null}
-        <button type="button" className={styles.add} aria-label={`Add ${license.name} to quote`} onClick={() => onAdd(product, license)}>
-          <Icon name="plus" size={18} />
-        </button>
-      </div>
+      {editing ? <button type="button" className={styles.edit} aria-label={`Edit ${license.name}`} title="Edit license" onClick={onEdit}><Icon name="edit" size={17} /></button> : null}
     </article>
   );
 }

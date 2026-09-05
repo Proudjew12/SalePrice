@@ -22,7 +22,8 @@ For sellers quoting licenses from multiple companies:
    Switch to **Edit Mode** to add, rename, or remove products and licenses, including the initial
    entries. Product short labels can also be changed.
 2. Choose **Monthly — Pay Monthly**, **Annual — Pay Monthly**, or **Annual — Pay Upfront**. Drag the license into
-   the quote, or use its **+** button. On a tablet, briefly hold the drag handle before moving it.
+   the quote, or click or tap its card. On a tablet, briefly hold the card before moving it;
+   swipe immediately to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
 3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
    default USD price for each billing schedule; adding it fills in the matching price. Override
    that price in the order whenever needed.
@@ -151,8 +152,9 @@ configuration.
 
 The first version deliberately keeps catalog selection, quote calculations, and versioned local
 storage in browser-owned domain features. This supports static GitHub Pages hosting without a
-database or deployed backend. `@dnd-kit/react` provides pointer and keyboard drag support; the
-separate add buttons also work with touch and keyboard. `jsPDF` is loaded on export and uses a
+database or deployed backend. `@dnd-kit/react` provides whole-card pointer dragging; native card
+buttons also support clicks, taps, and keyboard addition. Edit buttons remain separate controls.
+`jsPDF` is loaded on export and uses a
 bundled, licensed Unicode font for downloadable, paginated documents. React web meets the desktop
 and tablet requirement without a native app or Expo. Revisit persistence and API contracts when
 shared accounts or durable quote history become requirements.

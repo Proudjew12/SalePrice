@@ -62,6 +62,7 @@ test("starts empty, switches products, and searches licenses without requiring t
   await page.keyboard.press("Enter");
   const line = quoteLine(page, "Business Basic");
   await expect(line).toBeVisible();
+  await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await expect(line.getByRole("textbox", { name: /^Unit price/ })).toHaveValue("");
   expect(apiRequests).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -223,32 +224,46 @@ test("adds custom products and licenses and retains them after reload", async ({
   await expect(quoteLine(page, "Supervisor seat")).toBeVisible();
 });
 
-test("drags a license into the quote with a real mouse gesture", async ({ page, isMobile }) => {
+test("cancels a card drag safely and adds exactly once after a real mouse drop", async ({ page, isMobile }) => {
   test.skip(isMobile, "This scenario verifies desktop mouse input.");
   await page.goto("/");
   await saveBasicDefaultPrice(page);
-  const handle = page.getByRole("button", { name: "Drag Business Basic", exact: true });
+  const card = page.getByRole("button", { name: "Add Business Basic to quote", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
-  await expect(handle).toBeVisible();
-  const sourceBox = await handle.boundingBox();
+  await expect(card).toBeVisible();
+  const sourceBox = await card.boundingBox();
   const targetBox = await target.boundingBox();
   if (!sourceBox || !targetBox) throw new Error("Drag source and quote must be visible.");
-  await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2);
+  const start = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(start.x + 32, start.y, { steps: 8 });
+  await page.keyboard.press("Escape");
+  await page.mouse.up();
+  await expect(page.getByTestId("quote-line")).toHaveCount(0);
+
+  // Wait for the canceled card's return animation before starting a new gesture.
+  await card.hover();
+  const returnedBox = await card.boundingBox();
+  if (!returnedBox) throw new Error("The canceled card must return to the catalog.");
+  await page.mouse.move(returnedBox.x + returnedBox.width / 2, returnedBox.y + returnedBox.height / 2);
   await page.mouse.down();
   await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
   await page.mouse.up();
   await expect(quoteLine(page, "Business Basic")).toBeVisible();
   expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(15.5);
   await expect(page.getByTestId("quote-line")).toHaveCount(1);
+  await card.click();
+  await expect(page.getByTestId("quote-line")).toHaveCount(2);
 });
 
-test("supports real tablet finger dragging and tap-to-add", async ({ page, context }, testInfo) => {
+test("supports whole-card tablet dragging and adds exactly once per tap", async ({ page, context }, testInfo) => {
   test.skip(testInfo.project.name !== "tablet", "This scenario verifies tablet touchscreen input.");
   await page.goto("/");
   await saveBasicDefaultPrice(page);
-  const handle = page.getByRole("button", { name: "Drag Business Basic", exact: true });
+  const card = page.getByRole("button", { name: "Add Business Basic to quote", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
-  const sourceBox = await handle.boundingBox();
+  const sourceBox = await card.boundingBox();
   const targetBox = await target.boundingBox();
   if (!sourceBox || !targetBox) throw new Error("Tablet drag source and quote must be visible together.");
   const start = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
@@ -270,6 +285,7 @@ test("supports real tablet finger dragging and tap-to-add", async ({ page, conte
   }
   await expect(quoteLine(page, "Business Basic")).toBeVisible();
   expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: /^Unit price/ }).inputValue())).toBe(15.5);
+  await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).tap();
   await expect(quoteLine(page, "Business Standard")).toBeVisible();
   await expect(page.getByTestId("quote-line")).toHaveCount(2);
@@ -286,14 +302,16 @@ test("scrolls tablet license cards with a finger without accidentally adding the
     await dialog.getByRole("button", { name: "Add license", exact: true }).click();
   }
   const panel = page.getByRole("region", { name: "Licenses", exact: true });
+  const scrollCard = page.getByRole("button", { name: "Add Tablet license 8 to quote", exact: true });
+  await scrollCard.scrollIntoViewIfNeeded();
   const initialScroll = await panel.evaluate((element) => element.scrollTop);
   expect(await panel.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
-  const box = await panel.boundingBox();
-  if (!box) throw new Error("The license panel must be visible to swipe.");
+  const box = await scrollCard.boundingBox();
+  if (!box) throw new Error("A license card must be visible to swipe.");
   const x = box.x + box.width / 2;
-  // Dialog focus returns to Add license near the bottom; a downward finger swipe scrolls upward.
+  // A quick swipe over the card should scroll instead of activating a drag or a tap.
   const direction = initialScroll > 0 ? 1 : -1;
-  const startY = box.y + box.height * (direction > 0 ? 0.35 : 0.8);
+  const startY = box.y + box.height / 2;
   const session = await context.newCDPSession(page);
   try {
     await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y: startY, id: 1 }] });
