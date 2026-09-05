@@ -29,7 +29,7 @@ interface CatalogDialogProps {
 const PRICE_FIELDS = [
   { id: "monthly", label: "Monthly price", unit: "per license / month" },
   { id: "annual-monthly", label: "Annual paid monthly price", unit: "per license / month" },
-  { id: "annual-upfront", label: "Annual upfront price", unit: "per license / year" },
+  { id: "annual-upfront", label: "Annual paid yearly price", unit: "per license / year" },
 ] as const;
 
 function readText(form: FormData, key: string): string {

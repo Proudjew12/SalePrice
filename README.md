@@ -23,14 +23,14 @@ For sellers quoting licenses from multiple companies:
    entries. Product short labels can also be changed.
 2. Drag a license into the quote. Clicking or tapping a card does not add it.
    New items start with **Annual — Pay Monthly**;
-   choose **Monthly — Pay Monthly** or **Annual — Pay Upfront** on the order item when needed.
+   choose **Monthly — Pay Monthly** or **Annual — Pay Yearly** on the order item when needed.
    On a tablet, move a card to drag immediately, with no long press. Swipe the space beside the cards
    to scroll the catalog. Keyboard users can focus a card and press Enter or Space.
 3. Enter quantities, customer, quote reference, and optional notes. Each license can have a saved
    default USD price for each billing schedule; catalog cards show all three prices together,
    with monthly or yearly units. Adding a license fills in the matching price. Override that
    price in the order whenever needed.
-4. Review monthly payments, annual upfront charges, the amount due at the start, and a 12-month
+4. Review monthly payments, yearly payments, the amount due at the start, and a 12-month
    estimate; download the customer PDF using the button at the bottom.
 
 The initial catalog includes Microsoft 365, Google Workspace, Adobe Acrobat, and Zoom Workplace.
@@ -42,9 +42,10 @@ default price means manual entry; zero is a valid price. Editing or deleting a c
 existing order items intact. Deleting the last product or license is supported; Edit Mode can add
 entries again. The catalog supports 50 products, 100 licenses per product, and 2,000 licenses total.
 
-Monthly schedules use a price per license **per month**; annual upfront uses a price per license
-**per year**. Changing a quote line's billing schedule applies the matching saved catalog price,
-or clears the price for manual entry when none is available. Existing drafts without a catalog
+Monthly schedules use a price per license **per month**; yearly billing uses a price per license
+**per year**, paid in full at the start of each year. Changing a quote line's billing schedule applies
+the matching saved catalog price, or clears the price for manual entry when none is available.
+Existing drafts without a catalog
 license link also clear their price on a billing change. Catalog edits do not reprice existing lines.
 Quantities are whole numbers from 1–9,999; prices allow zero through $1,000,000 with up to two decimal
 places. Calculations use integer cents. Quotes support up to 100 lines and exclude taxes. The
@@ -174,7 +175,8 @@ list. Order cards fit three per row on wide screens and wrap into fewer columns 
 or at larger text sizes. Compact fields retain larger touch targets on tablets. Each order card
 shows the bold product name followed by the license name on one line, with a **Price** field and the
 billing period beside the line total. Catalog cards compare Monthly, Annual · Monthly, and
-Annual · Upfront rates, distinguishing unset prices from zero.
+Annual · Yearly rates, distinguishing unset prices from zero. The drag instruction appears only
+while the order has no licenses.
 The header displays the SalePrice logo as plain branding, a percentage-only text-size selector
 from 50% to 150% in 10% steps, and a Normal/Edit Mode button. Source Sans 3 from Google Fonts is bundled locally under
 the SIL Open Font License in `frontend/src/styles/fonts/`; unsupported scripts use the system font.

@@ -51,7 +51,7 @@ export const BILLING_OPTIONS: ReadonlyArray<{
   },
   {
     id: "annual-upfront",
-    label: "Annual — Pay Upfront",
+    label: "Annual — Pay Yearly",
     description: "A 12-month subscription, paid in full at the start of each year.",
     unitLabel: "per license / year",
   },

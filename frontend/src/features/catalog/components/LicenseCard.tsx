@@ -19,7 +19,7 @@ interface LicenseCardProps {
 const PRICE_OPTIONS = [
   { id: "monthly", label: "Monthly", unit: "/ mo" },
   { id: "annual-monthly", label: "Annual · Monthly", unit: "/ mo" },
-  { id: "annual-upfront", label: "Annual · Upfront", unit: "/ yr" },
+  { id: "annual-upfront", label: "Annual · Yearly", unit: "/ yr" },
 ] as const;
 
 const cardPointerSensor = PointerSensor.configure({

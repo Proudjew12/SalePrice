@@ -14,14 +14,14 @@ test("chooses every billing schedule from the open picker with mouse or touch at
   const dialog = page.getByRole("dialog", { name: "Edit license", exact: true });
   await dialog.getByLabel("Monthly price", { exact: true }).fill("12.50");
   await dialog.getByLabel("Annual paid monthly price", { exact: true }).fill("10");
-  await dialog.getByLabel("Annual upfront price", { exact: true }).fill("120");
+  await dialog.getByLabel("Annual paid yearly price", { exact: true }).fill("120");
   await dialog.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
   await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
   await expect(page.getByRole("region", { name: "Licenses", exact: true }).getByRole("combobox")).toHaveCount(0);
 
   for (const option of [
-    { label: "Annual — Pay Upfront", value: "annual-upfront", price: 120 },
+    { label: "Annual — Pay Yearly", value: "annual-upfront", price: 120 },
     { label: "Monthly — Pay Monthly", value: "monthly", price: 12.5 },
     { label: "Annual — Pay Monthly", value: "annual-monthly", price: 10 },
   ]) {
@@ -43,7 +43,7 @@ test("chooses every billing schedule from the open picker with mouse or touch at
     expect(Number(await line.getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(option.price);
   }
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$22.50");
-  await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$120.00");
+  await expect(page.getByLabel("Yearly payments", { exact: true })).toHaveText("$120.00");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -56,7 +56,7 @@ test("cancels and commits keyboard billing choices while preserving order data o
   await expect(line.getByText("per month", { exact: true })).toBeVisible();
   await picker.focus();
   await page.keyboard.press("Space");
-  await expect(picker.getByRole("option", { name: "Annual — Pay Upfront", exact: true })).toBeVisible();
+  await expect(picker.getByRole("option", { name: "Annual — Pay Yearly", exact: true })).toBeVisible();
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Escape");
   await expect(picker).toBeFocused();
@@ -81,5 +81,5 @@ test("cancels and commits keyboard billing choices while preserving order data o
   await page.reload();
   await expect(picker).toHaveValue("annual-upfront");
   await expect(yearlyPrice).toHaveValue("180");
-  await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$180.00");
+  await expect(page.getByLabel("Yearly payments", { exact: true })).toHaveText("$180.00");
 });

@@ -11,10 +11,10 @@ test("shows every saved catalog price after reload and distinguishes zero from a
   const editor = page.getByRole("dialog", { name: "Edit license", exact: true });
   await editor.getByLabel("Monthly price", { exact: true }).fill("21");
   await editor.getByLabel("Annual paid monthly price", { exact: true }).fill("22");
-  await editor.getByLabel("Annual upfront price", { exact: true }).fill("23");
+  await editor.getByLabel("Annual paid yearly price", { exact: true }).fill("23");
   await editor.getByRole("button", { name: "Save changes", exact: true }).click();
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
-  for (const label of ["Monthly", "Annual · Monthly", "Annual · Upfront"]) {
+  for (const label of ["Monthly", "Annual · Monthly", "Annual · Yearly"]) {
     await expect(card.getByText(label, { exact: true })).toBeVisible();
   }
   for (const price of ["$21.00", "$22.00", "$23.00"]) {
@@ -31,6 +31,21 @@ test("shows every saved catalog price after reload and distinguishes zero from a
   }
   await expect(card.getByText("/ mo", { exact: true })).toHaveCount(2);
   await expect(card.getByText("/ yr", { exact: true })).toBeVisible();
+  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("100");
+  for (const width of [1867, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    const label = card.getByText("Annual · Monthly", { exact: true });
+    await expect(label).toBeVisible();
+    expect(await label.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const fragments = range.getClientRects();
+      const box = element.getBoundingClientRect();
+      return fragments.length === 1 && fragments[0].left >= box.left && fragments[0].right <= box.right;
+    }), `Annual · Monthly must fit on one line at ${width}px and 100%`).toBe(true);
+  }
+  await page.setViewportSize({ width: 834, height: 1194 });
+  await page.getByRole("combobox", { name: "Text size", exact: true }).selectOption("150");
   await page.reload();
   await card.getByRole("button", { name: "Add Business Basic to quote", exact: true }).press("Enter");
   const line = page.getByRole("group", { name: "Business Basic", exact: true });

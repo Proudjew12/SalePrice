@@ -1,3 +1,4 @@
+import { pointerIntersection } from "@dnd-kit/collision";
 import { useDroppable } from "@dnd-kit/react";
 
 import { Icon } from "@/components/ui/Icon";
@@ -17,10 +18,10 @@ interface Props {
 }
 
 export function QuoteCanvas({ quote, exporting, onExport, onNewOrder, catalogWarning, exportError }: Props) {
-  const { ref, isDropTarget } = useDroppable({ id: "quote-items", accept: "license" });
+  const { ref, isDropTarget } = useDroppable({ id: "quote-items", accept: "license", collisionDetector: pointerIntersection });
   const { draft } = quote;
   return (
-    <main className={styles.quote} id="quote-content" aria-label="Order" tabIndex={-1}>
+    <main ref={ref} className={styles.quote} id="quote-content" aria-label="Order" tabIndex={-1}>
       <div className={styles.scroll}>
         <div className={styles.orderActions}>
           <button className={styles.newOrder} type="button" onClick={onNewOrder}><Icon name="plus" size={17} />New Order</button>
@@ -35,14 +36,13 @@ export function QuoteCanvas({ quote, exporting, onExport, onNewOrder, catalogWar
           <label className={styles.reference}>Quote reference<input value={draft.reference} maxLength={64}
             onChange={(event) => quote.editDetails({ reference: event.target.value })} /></label>
         </div>
-        <section ref={ref} aria-label="Quote items" className={classNames(styles.items, isDropTarget && styles.over)}>
+        <section aria-label="Quote items" className={classNames(styles.items, isDropTarget && styles.over)}>
           {draft.lines.map((line) => <QuoteLineEditor key={line.id} line={line} onChange={(patch) => quote.editLine(line.id, patch)}
             onRemove={() => quote.removeLine(line.id)} />)}
-          <div className={classNames(styles.dropzone, draft.lines.length === 0 && styles.empty)}>
-            <span className={styles.dropIcon}><Icon name={draft.lines.length ? "plus" : "document"} size={26} /></span>
-            <p>{isDropTarget ? "Release to add this license" : draft.lines.length ? "Drop another license here" : "Your next quote starts here"}</p>
-            {draft.lines.length === 0 ? <span>Drag a license card here to add it.</span> : null}
-          </div>
+          {draft.lines.length === 0 ? <div className={styles.empty}>
+            <span className={styles.dropIcon}><Icon name="documentPlus" size={32} strokeWidth={1.5} /></span>
+            <p>Drag a license card here to add it</p>
+          </div> : null}
         </section>
         <label className={styles.notes}>Notes<textarea value={draft.notes} maxLength={4000} placeholder="Add any notes for this quote…" rows={3}
           onChange={(event) => quote.editDetails({ notes: event.target.value })} /></label>

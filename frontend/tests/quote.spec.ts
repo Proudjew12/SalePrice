@@ -35,6 +35,12 @@ async function saveBasicDefaultPrice(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Edit Mode", exact: true }).click();
 }
 
+async function expectEmptyQuote(page: Page): Promise<void> {
+  await expect(page.getByTestId("quote-line")).toHaveCount(0);
+  await expect(page.getByText("Drag a license card here to add it", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Your next quote starts here|Drop another license here/)).toHaveCount(0);
+}
+
 test("starts empty, switches products, and searches licenses without requiring the API", async ({ page }) => {
   const apiRequests: string[] = [];
   page.on("request", (request) => {
@@ -93,7 +99,7 @@ test("calculates mixed billing correctly, preserves edits, removes lines, and do
   await expect(premium.getByText("per year", { exact: true })).toBeVisible();
 
   await expectAmount(page, "Monthly payments", "$53.50");
-  await expectAmount(page, "Annual upfront", "$480.00");
+  await expectAmount(page, "Yearly payments", "$480.00");
   await expectAmount(page, "Due at start", "$533.50");
   await expectAmount(page, "12-month estimate", "$1,122.00");
   await page.reload();
@@ -240,6 +246,7 @@ test("ignores catalog clicks and canceled or outside drags, adding once after a 
   await saveBasicDefaultPrice(page);
   const card = page.getByRole("button", { name: "Add Business Basic to quote", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
+  await expectEmptyQuote(page);
   await expect(card).toBeVisible();
   await card.click();
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
@@ -263,19 +270,27 @@ test("ignores catalog clicks and canceled or outside drags, adding once after a 
   await page.mouse.up();
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
 
-  // Wait for the canceled card's return animation before starting a new gesture.
-  await card.hover();
-  const returnedBox = await card.boundingBox();
-  if (!returnedBox) throw new Error("The canceled card must return to the catalog.");
-  await page.mouse.move(returnedBox.x + returnedBox.width / 2, returnedBox.y + returnedBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2, { steps: 20 });
-  await page.mouse.up();
-  await expect(quoteLine(page, "Business Basic")).toBeVisible();
-  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
-  await expect(page.getByTestId("quote-line")).toHaveCount(1);
-  await card.click();
-  await expect(page.getByTestId("quote-line")).toHaveCount(1);
+  for (const count of [1, 2]) {
+    // Wait for return feedback and remeasure the populated order before the next drag.
+    await card.hover();
+    const returnedBox = await card.boundingBox();
+    const orderBox = await target.boundingBox();
+    if (!returnedBox || !orderBox) throw new Error("The catalog card and order must remain available for another drop.");
+    await page.mouse.move(returnedBox.x + returnedBox.width / 2, returnedBox.y + returnedBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(orderBox.x + orderBox.width / 2, orderBox.y + orderBox.height / 2, { steps: 20 });
+    await page.mouse.up();
+    await expect(page.getByTestId("quote-line")).toHaveCount(count);
+    expect(Number(await quoteLine(page, "Business Basic").last().getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
+    await expect(page.getByText(/Drag a license card here to add it|Drop another license here/)).toHaveCount(0);
+    await card.click();
+    await expect(page.getByTestId("quote-line")).toHaveCount(count);
+  }
+  for (const count of [1, 0]) {
+    await page.getByRole("button", { name: "Remove Business Basic", exact: true }).first().click();
+    await expect(page.getByTestId("quote-line")).toHaveCount(count);
+  }
+  await expectEmptyQuote(page);
 });
 
 test("ignores tablet taps, cancels safely, and adds once from an immediate finger drag", async ({ page, context }, testInfo) => {
@@ -284,13 +299,13 @@ test("ignores tablet taps, cancels safely, and adds once from an immediate finge
   await saveBasicDefaultPrice(page);
   const card = page.getByRole("button", { name: "Add Business Basic to quote", exact: true });
   const target = page.getByRole("region", { name: "Quote items", exact: true });
+  await expectEmptyQuote(page);
   await card.tap();
   await expect(page.getByTestId("quote-line")).toHaveCount(0);
   const sourceBox = await card.boundingBox();
   const targetBox = await target.boundingBox();
   if (!sourceBox || !targetBox) throw new Error("Tablet drag source and quote must be visible together.");
   const start = { x: sourceBox.x + sourceBox.width / 2, y: sourceBox.y + sourceBox.height / 2 };
-  const end = { x: targetBox.x + targetBox.width / 2, y: targetBox.y + targetBox.height / 2 };
   const session = await context.newCDPSession(page);
   try {
     await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ ...start, id: 1 }] });
@@ -298,35 +313,43 @@ test("ignores tablet taps, cancels safely, and adds once from an immediate finge
     await session.send("Input.dispatchTouchEvent", { type: "touchCancel", touchPoints: [] });
     await expect(page.getByTestId("quote-line")).toHaveCount(0);
 
-    // Wait for cancellation feedback to finish without dispatching another tap.
-    await card.tap({ trial: true });
-    const returnedBox = await card.boundingBox();
-    if (!returnedBox) throw new Error("The canceled tablet card must return to the catalog.");
-    const immediateStart = { x: returnedBox.x + returnedBox.width / 2, y: returnedBox.y + returnedBox.height / 2 };
-    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ ...immediateStart, id: 1 }] });
-    // Move beyond the old hold sensor's tolerance immediately; no stationary press.
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove", touchPoints: [{ x: immediateStart.x + 16, y: immediateStart.y, id: 1 }],
-    });
-    for (let step = 1; step <= 20; step += 1) {
+    for (const count of [1, 2]) {
+      await card.tap({ trial: true });
+      const returnedBox = await card.boundingBox();
+      const orderBox = await target.boundingBox();
+      if (!returnedBox || !orderBox) throw new Error("The tablet card and order must remain available for another drop.");
+      const immediateStart = { x: returnedBox.x + returnedBox.width / 2, y: returnedBox.y + returnedBox.height / 2 };
+      const end = { x: orderBox.x + orderBox.width / 2, y: orderBox.y + orderBox.height / 2 };
+      await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ ...immediateStart, id: 1 }] });
+      // Move beyond the old hold sensor's tolerance immediately; no stationary press.
       await session.send("Input.dispatchTouchEvent", {
-        type: "touchMove",
-        touchPoints: [{ x: immediateStart.x + (end.x - immediateStart.x) * step / 20, y: immediateStart.y + (end.y - immediateStart.y) * step / 20, id: 1 }],
+        type: "touchMove", touchPoints: [{ x: immediateStart.x + 16, y: immediateStart.y, id: 1 }],
       });
+      for (let step = 1; step <= 20; step += 1) {
+        await session.send("Input.dispatchTouchEvent", {
+          type: "touchMove",
+          touchPoints: [{ x: immediateStart.x + (end.x - immediateStart.x) * step / 20, y: immediateStart.y + (end.y - immediateStart.y) * step / 20, id: 1 }],
+        });
+      }
+      await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+      await expect(page.getByTestId("quote-line")).toHaveCount(count);
+      expect(Number(await quoteLine(page, "Business Basic").last().getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
+      await expect(page.getByText(/Drag a license card here to add it|Drop another license here/)).toHaveCount(0);
     }
-    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   } finally {
     await session.detach();
   }
-  await expect(quoteLine(page, "Business Basic")).toBeVisible();
-  expect(Number(await quoteLine(page, "Business Basic").getByRole("textbox", { name: "Price", exact: true }).inputValue())).toBe(15.5);
-  await expect(page.getByTestId("quote-line")).toHaveCount(1);
   await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).tap();
   await expect(quoteLine(page, "Business Standard")).toHaveCount(0);
-  await expect(page.getByTestId("quote-line")).toHaveCount(1);
+  await expect(page.getByTestId("quote-line")).toHaveCount(2);
   await page.getByRole("button", { name: "Add Business Standard to quote", exact: true }).press("Space");
   await expect(quoteLine(page, "Business Standard")).toBeVisible();
-  await expect(page.getByTestId("quote-line")).toHaveCount(2);
+  await expect(page.getByTestId("quote-line")).toHaveCount(3);
+  for (const count of [2, 1, 0]) {
+    await page.getByTestId("quote-line").first().getByRole("button", { name: /^Remove / }).tap();
+    await expect(page.getByTestId("quote-line")).toHaveCount(count);
+  }
+  await expectEmptyQuote(page);
 });
 
 test("scrolls the tablet catalog from its blank gutter without adding licenses", async ({ page, context }, testInfo) => {

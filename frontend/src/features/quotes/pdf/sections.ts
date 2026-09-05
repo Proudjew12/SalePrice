@@ -33,7 +33,7 @@ export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): vo
   const terms = [
     "Prices are in USD and exclude taxes.",
     "Annual subscriptions carry a 12-month commitment.",
-    "Amount due at start includes the first monthly payment and all annual upfront charges.",
+    "Amount due at start includes the first monthly payment and each yearly payment in full.",
     "The 12-month estimate assumes monthly subscriptions continue for 12 months.",
   ];
   let termsY = top + 12;
@@ -46,7 +46,7 @@ export function writeQuoteSummary(layout: QuotePdfLayout, draft: QuoteDraft): vo
   const summaryX = 101;
   layout.text("Monthly payments", summaryX, top + 4, 51, 8);
   layout.right(formatMoney(totals.monthlyCents), 153, top + 4, 39, 9, "bold");
-  layout.text("Annual upfront payments", summaryX, top + 12, 51, 8);
+  layout.text("Yearly payments", summaryX, top + 12, 51, 8);
   layout.right(formatMoney(totals.annualUpfrontCents), 153, top + 12, 39, 9, "bold");
   layout.rule(top + 17, summaryX, 91);
   layout.fill(summaryX, top + 21, 91, 20);

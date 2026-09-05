@@ -71,7 +71,7 @@ test("edits built-in names and billing prices without changing existing order li
   await licenseDialog.getByLabel("License name", { exact: true }).fill("Core seat");
   await licenseDialog.getByLabel("Monthly price", { exact: true }).fill("18.75");
   await licenseDialog.getByLabel("Annual paid monthly price", { exact: true }).fill("12.50");
-  await licenseDialog.getByLabel("Annual upfront price", { exact: true }).fill("130");
+  await licenseDialog.getByLabel("Annual paid yearly price", { exact: true }).fill("130");
   await saveChanges(licenseDialog);
   await expect(original.getByText("Microsoft 365", { exact: true })).toBeVisible();
   await expectPrice(original, 8.25);
@@ -85,7 +85,7 @@ test("edits built-in names and billing prices without changing existing order li
     await expectPrice(line, price);
   }
   await expect(page.getByLabel("Monthly payments", { exact: true })).toHaveText("$47.75");
-  await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$130.00");
+  await expect(page.getByLabel("Yearly payments", { exact: true })).toHaveText("$130.00");
   await page.reload();
   await expect(page.getByRole("button", { name: "Microsoft Business", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Add Core seat to quote", exact: true })).toBeVisible();
@@ -128,7 +128,7 @@ test("saves default prices on new products and licenses, including zero and the 
   await product.getByLabel("Product name", { exact: true }).fill("Support Tools");
   await product.getByLabel("First license name", { exact: true }).fill("Support seat");
   await product.getByLabel("Monthly price", { exact: true }).fill("0");
-  await product.getByLabel("Annual upfront price", { exact: true }).fill("1000000");
+  await product.getByLabel("Annual paid yearly price", { exact: true }).fill("1000000");
   await product.getByRole("button", { name: "Add product", exact: true }).click();
   await page.getByRole("button", { name: "Add license", exact: true }).click();
   const license = page.getByRole("dialog", { name: "Add license", exact: true });
@@ -149,7 +149,7 @@ test("saves default prices on new products and licenses, including zero and the 
   await page.getByRole("button", { name: "Add Support seat to quote", exact: true }).press("Enter");
   await page.getByRole("group", { name: "Support seat", exact: true }).last().getByRole("combobox", { name: "Billing Option", exact: true }).selectOption("annual-upfront");
   await expectPrice(page.getByRole("group", { name: "Support seat", exact: true }).last(), 1000000);
-  await expect(page.getByLabel("Annual upfront", { exact: true })).toHaveText("$1,000,000.00");
+  await expect(page.getByLabel("Yearly payments", { exact: true })).toHaveText("$1,000,000.00");
 });
 
 test("rejects duplicate names and invalid default prices without overwriting saved entries", async ({ page }) => {

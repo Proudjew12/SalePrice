@@ -5,7 +5,7 @@ import { cleanPdfField, PDF_COLORS, PDF_PAGE, QuotePdfLayout } from "./layout";
 const BILLING_LABELS: Record<BillingOption, [string, string]> = {
   monthly: ["Monthly subscription", "Paid monthly"],
   "annual-monthly": ["Annual subscription", "Paid monthly"],
-  "annual-upfront": ["Annual subscription", "Paid annually upfront"],
+  "annual-upfront": ["Annual subscription", "Paid yearly"],
 };
 
 function tableHeader(layout: QuotePdfLayout): void {

@@ -2,10 +2,12 @@
 
 SalePrice's React, Vite, TypeScript, and SCSS Modules application builds customer software-license
 quotes. Choose or create catalog entries, drag to add licenses, enter your own USD prices,
-and export a PDF. The three billing schedules distinguish monthly payments from annual upfront
-charges, and catalog cards show all three saved prices together. Clicking or tapping a card does
-not add it; keyboard users can focus a card and press Enter or Space. One draft and custom catalog
-entries are saved in this browser on this device.
+and export a PDF. The three billing schedules distinguish monthly payments from yearly payments
+made in full at the start of each year, and catalog cards show all three saved prices together.
+Clicking or tapping a card does not add it; keyboard users can focus a card and press Enter or Space.
+One draft and custom catalog
+entries are saved in this browser on this device. The drag instruction appears only while the
+order has no licenses.
 
 This folder is intentionally independent from `backend/`. It communicates with the backend only
 through HTTP and can be copied into its own repository without changing its internal structure.

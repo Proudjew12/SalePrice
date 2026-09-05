@@ -24,7 +24,7 @@ export function QuoteSummary({ draft, exporting, onExport }: Props) {
     <footer className={styles.summary}>
       <div className={styles.metrics}>
         <div><span>Monthly payments</span><output aria-label="Monthly payments">{monthlyValid ? formatMoney(totals.monthlyCents) : "—"}</output></div>
-        <div><span>Annual upfront</span><output aria-label="Annual upfront">{annualValid ? formatMoney(totals.annualUpfrontCents) : "—"}</output></div>
+        <div><span>Yearly payments</span><output aria-label="Yearly payments">{annualValid ? formatMoney(totals.annualUpfrontCents) : "—"}</output></div>
         <div><span>Due at start</span><output aria-label="Due at start">{monthlyValid && annualValid ? formatMoney(totals.dueNowCents) : "—"}</output></div>
       </div>
       <div className={styles.action}>
