@@ -223,7 +223,7 @@ test("persists an empty catalog and can add a product again without losing the o
     await license.getByRole("button", { name: "Delete license", exact: true }).click();
   }
   await expect(page.getByText("No licenses yet", { exact: true })).toBeVisible();
-  for (const name of ["Microsoft 365", "Google Workspace", "Adobe Acrobat", "Zoom Workplace"]) {
+  for (const name of ["Microsoft 365", "Google Workspace", "Adobe Acrobat", "Zoom Workplace", "Acronis"]) {
     await page.getByRole("button", { name, exact: true }).click();
     const product = await editProduct(page);
     page.once("dialog", (confirmation) => confirmation.accept());

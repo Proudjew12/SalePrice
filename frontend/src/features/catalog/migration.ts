@@ -1,4 +1,4 @@
-import { DEFAULT_PRODUCTS } from "./data";
+import { ACRONIS_EXAMPLE, DEFAULT_PRODUCTS } from "./data";
 import type { CatalogLicense, CatalogProduct, CatalogSnapshot } from "./types";
 import { copyCatalog, isCatalogSnapshot, isRecord, validCatalogName, validShortName } from "./validation";
 
@@ -39,7 +39,9 @@ export function migrateLegacyCatalog(value: unknown): CatalogSnapshot | null {
     return null;
   }
   const source: LegacyCatalog = { version: 1, products: value.products, licenses: value.licenses };
-  const products = [...DEFAULT_PRODUCTS, ...source.products];
+  // Acronis was introduced after v1; preserve valid legacy custom entries with that name.
+  const originalDefaults = DEFAULT_PRODUCTS.filter((product) => product.id !== ACRONIS_EXAMPLE.id);
+  const products = [...originalDefaults, ...source.products];
   if (!source.licenses.every((entry) => products.some((product) => product.id === entry.productId))) {
     return null;
   }

@@ -1,4 +1,4 @@
-import { DEFAULT_PRODUCTS } from "./data";
+import { ACRONIS_EXAMPLE, DEFAULT_PRODUCTS } from "./data";
 import { LEGACY_CATALOG_STORAGE_KEY, LEGACY_STORED_CHARACTERS, migrateLegacyCatalog } from "./migration";
 import { CATALOG_LIMITS } from "./types";
 import type { CatalogSnapshot } from "./types";
@@ -16,13 +16,33 @@ function fallbackCatalog(warning: string | null): CatalogState {
   return { catalog: copyCatalog(DEFAULT_PRODUCTS), warning };
 }
 
+function applyAcronisExample(snapshot: CatalogSnapshot): CatalogState {
+  let catalog = copyCatalog(snapshot.products);
+  let warning: string | null = null;
+  const conflicts = catalog.products.some((product) =>
+    product.id === ACRONIS_EXAMPLE.id || product.name.toLowerCase() === ACRONIS_EXAMPLE.name.toLowerCase() ||
+    product.licenses.some((license) => ACRONIS_EXAMPLE.licenses.some((example) => example.id === license.id)));
+  if (!conflicts) {
+    const expanded = copyCatalog([...catalog.products, ACRONIS_EXAMPLE]);
+    if (isCatalogSnapshot(expanded)) catalog = expanded;
+    else warning = "The Acronis example could not be added because the catalog is full.";
+  }
+  // Record this one-time update even when an existing entry or capacity prevents insertion.
+  const saved = saveCatalog(catalog);
+  return { catalog, warning: saved ? warning : [warning, UNSAVED_WARNING].filter(Boolean).join(" ") };
+}
+
 export function loadCatalog(): CatalogState {
   try {
     const stored = localStorage.getItem(CATALOG_STORAGE_KEY);
     if (stored !== null) {
       if (stored.length <= CATALOG_LIMITS.storedCharacters) {
         const parsed: unknown = JSON.parse(stored);
-        if (isCatalogSnapshot(parsed)) return { catalog: copyCatalog(parsed.products), warning: null };
+        if (isCatalogSnapshot(parsed)) {
+          return parsed.seedRevision === 1
+            ? { catalog: copyCatalog(parsed.products), warning: null }
+            : applyAcronisExample(parsed);
+        }
       }
       return fallbackCatalog("Saved products could not be read. The default catalog is available.");
     }
@@ -34,8 +54,7 @@ export function loadCatalog(): CatalogState {
       const catalog = migrateLegacyCatalog(parsed);
       if (catalog) {
         // Keep the v1 source intact for recovery. A saved v2 snapshot takes precedence on later visits.
-        const saved = saveCatalog(catalog);
-        return { catalog, warning: saved ? null : UNSAVED_WARNING };
+        return applyAcronisExample(catalog);
       }
     }
     return fallbackCatalog("Saved products could not be read. The default catalog is available.");

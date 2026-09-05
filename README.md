@@ -30,6 +30,8 @@ For sellers quoting licenses from multiple companies:
    estimate; download the customer PDF using the button at the bottom.
 
 The initial catalog includes Microsoft 365, Google Workspace, Adobe Acrobat, and Zoom Workplace.
+It also includes Acronis with one unpriced **Example license**, a demonstration entry rather than
+an official plan. The example is added once to older saved catalogs; it can be edited or removed.
 These are unpriced starting names, not a live price feed. Confirm each vendor's applicable plans
 and billing terms before quoting. All catalog edits and default prices are saved locally. A blank
 default price means manual entry; zero is a valid price. Editing or deleting a catalog entry leaves

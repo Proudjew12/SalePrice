@@ -17,6 +17,7 @@ export interface CatalogProduct {
 
 export interface CatalogSnapshot {
   version: 2;
+  seedRevision?: 1;
   products: CatalogProduct[];
 }
 

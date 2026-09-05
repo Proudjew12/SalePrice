@@ -1,5 +1,13 @@
 import type { CatalogProduct } from "./types";
 
+// User-requested demonstration entry, not an official Acronis plan or price.
+export const ACRONIS_EXAMPLE: CatalogProduct = {
+  id: "acronis",
+  name: "Acronis",
+  shortName: "Acr",
+  licenses: [{ id: "acronis-example", name: "Example license" }],
+};
+
 // A starter selection of license names, verified on the vendors' official pages.
 // These definitions are not a live catalog and deliberately contain no vendor prices.
 // Microsoft: https://www.microsoft.com/en-us/microsoft-365/business/microsoft-365-plans-and-pricing
@@ -45,4 +53,5 @@ export const DEFAULT_PRODUCTS: CatalogProduct[] = [
       { id: "zoom-workplace-business", name: "Workplace Business" },
     ],
   },
+  ACRONIS_EXAMPLE,
 ];

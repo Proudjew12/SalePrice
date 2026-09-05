@@ -46,7 +46,8 @@ function isProduct(value: unknown): value is CatalogProduct {
 }
 
 export function isCatalogSnapshot(value: unknown): value is CatalogSnapshot {
-  if (!isRecord(value) || value.version !== 2 || !Array.isArray(value.products) ||
+  if (!isRecord(value) || value.version !== 2 ||
+    (value.seedRevision !== undefined && value.seedRevision !== 1) || !Array.isArray(value.products) ||
     value.products.length > CATALOG_LIMITS.products || !value.products.every(isProduct)) {
     return false;
   }
@@ -64,6 +65,7 @@ export function isCatalogSnapshot(value: unknown): value is CatalogSnapshot {
 export function copyCatalog(products: CatalogProduct[]): CatalogSnapshot {
   return {
     version: 2,
+    seedRevision: 1,
     products: products.map((product) => ({
       id: product.id,
       name: product.name,
