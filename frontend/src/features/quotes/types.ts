@@ -12,6 +12,8 @@ export interface QuoteLine {
 
 export interface QuoteDraft {
   version: 1;
+  // Keep automatic numbering independent of the editable reference; older drafts omit it.
+  sequence?: number;
   reference: string;
   customer: string;
   notes: string;

@@ -47,9 +47,13 @@ places. Calculations use integer cents. Quotes support up to 100 lines and exclu
 
 One active draft is saved in this browser on this device. There are no accounts, cross-device sync,
 quote history, vendor imports, or tax calculations in this version. Download a PDF before starting
-a new quote. Clearing site data removes local drafts and custom catalog entries; a new domain has
-separate browser storage. Customer details and prices stay in the browser, and PDF generation uses
-locally bundled code and fonts without sending quote data to a server.
+a new quote. New quote references use **SP-0001**, **SP-0002**, and so on, advancing with each
+**New Order**. References remain editable; changing one keeps the numbering sequence for the next
+order. Existing filled-in drafts retain their references. Numbering is local to the saved draft,
+not shared between users or devices. Clearing site data resets numbering and removes local drafts
+and custom catalog entries; a new domain has separate browser storage. Customer details and prices
+stay in the browser. PDF generation uses locally bundled code and fonts without sending quote data
+to a server.
 
 Acceptance checks cover desktop mouse drag, tablet press-and-drag and tap, keyboard addition,
 all three billing schedules, invalid input, local persistence, PDF download and retry, responsive

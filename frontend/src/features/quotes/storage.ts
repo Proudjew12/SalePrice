@@ -34,6 +34,9 @@ export function isQuoteDate(value: string): boolean {
 export function isQuoteDraft(value: unknown): value is QuoteDraft {
   if (
     !isRecord(value) || value.version !== 1 ||
+    (value.sequence !== undefined && (
+      typeof value.sequence !== "number" || !Number.isSafeInteger(value.sequence) || value.sequence < 1
+    )) ||
     !isText(value.reference, QUOTE_LIMITS.reference) ||
     !isText(value.customer, QUOTE_LIMITS.customer) ||
     !isText(value.notes, QUOTE_LIMITS.notes) ||
@@ -46,17 +49,21 @@ export function isQuoteDraft(value: unknown): value is QuoteDraft {
   return new Set(value.lines.map((line: QuoteLine) => line.id)).size === value.lines.length;
 }
 
-export function createDraft(): QuoteDraft {
+export function formatQuoteReference(sequence: number): string {
+  return `SP-${String(sequence).padStart(4, "0")}`;
+}
+
+export function createDraft(sequence = 1): QuoteDraft {
   const today = new Date();
   const date = [
     String(today.getFullYear()),
     String(today.getMonth() + 1).padStart(2, "0"),
     String(today.getDate()).padStart(2, "0"),
   ].join("-");
-  const suffix = globalThis.crypto.randomUUID().slice(0, 8).toUpperCase();
   return {
     version: 1,
-    reference: `SP-${date.replaceAll("-", "")}-${suffix}`,
+    sequence,
+    reference: formatQuoteReference(sequence),
     customer: "",
     notes: "",
     date,
@@ -70,7 +77,16 @@ export function loadDraft(): { draft: QuoteDraft; warning: string | null; } {
     if (stored === null) return { draft: createDraft(), warning: null };
     if (stored.length <= MAX_STORED_CHARACTERS) {
       const parsed: unknown = JSON.parse(stored);
-      if (isQuoteDraft(parsed)) return { draft: parsed, warning: null };
+      if (isQuoteDraft(parsed)) {
+        const emptyLegacyDraft = parsed.sequence === undefined &&
+          /^SP-\d{8}-[A-F0-9]{8}$/.test(parsed.reference) &&
+          !parsed.customer && !parsed.notes && parsed.lines.length === 0;
+        if (emptyLegacyDraft) {
+          const { sequence, reference } = createDraft();
+          return { draft: { ...parsed, sequence, reference }, warning: null };
+        }
+        return { draft: parsed, warning: null };
+      }
     }
     return { draft: createDraft(), warning: "The saved quote could not be read. A new draft is ready." };
   } catch {

@@ -48,9 +48,9 @@ export function QuoteWorkspace() {
   }
 
   function newOrder() {
-    const hasWork = quote.draft.lines.length > 0 || quote.draft.customer.trim() || quote.draft.notes.trim();
-    if (hasWork && !window.confirm("Start a new order? Export your current order first if you want to keep it.")) return;
-    quote.reset(); setMessage("New order started."); setExportError("");
+    if (quote.hasWork && !window.confirm("Start a new order? Export your current order first if you want to keep it.")) return;
+    if (!quote.reset()) return;
+    setMessage("New order started."); setExportError("");
   }
 
   function submitCatalog(input: CatalogEditorInput): string | null {

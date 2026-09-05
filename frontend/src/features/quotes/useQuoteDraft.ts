@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 
 import { parsePriceCents } from "@/features/quotes/calculations";
-import { createDraft, loadDraft, saveDraft } from "@/features/quotes/storage";
+import { createDraft, formatQuoteReference, loadDraft, saveDraft } from "@/features/quotes/storage";
 import type { BillingOption, QuoteDraft, QuoteLine } from "@/features/quotes/types";
 
 export function useQuoteDraft() {
@@ -33,14 +33,27 @@ export function useQuoteDraft() {
     }) }));
   }
 
+  function reset(): boolean {
+    const sequence = (current.current.sequence ?? 0) + 1;
+    if (!Number.isSafeInteger(sequence)) {
+      setState((previous) => ({
+        ...previous, warning: "The order number cannot be increased. Your current order has been kept.",
+      }));
+      return false;
+    }
+    commit(() => createDraft(sequence));
+    return true;
+  }
+
   return {
-    ...state, addLine, editLine,
+    ...state, addLine, editLine, reset,
+    hasWork: Boolean(state.draft.lines.length || state.draft.customer.trim() || state.draft.notes.trim() ||
+      state.draft.sequence === undefined || state.draft.reference !== formatQuoteReference(state.draft.sequence)),
     editDetails: (patch: Partial<Pick<QuoteDraft, "customer" | "reference" | "notes">>) =>
       commit((draft) => ({ ...draft, ...patch })),
     removeLine: (id: string) => commit((draft) => ({
       ...draft, lines: draft.lines.filter((line) => line.id !== id),
     })),
-    reset: () => commit(() => createDraft()),
     dismissWarning: () => setState((previous) => ({ ...previous, warning: null })),
   };
 }
